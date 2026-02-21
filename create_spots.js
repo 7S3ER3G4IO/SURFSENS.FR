@@ -1,0 +1,78 @@
+const fs = require('fs');
+
+const spots = [
+  // Brittany
+  { id: "blancs-sablons", name: "Les Blancs Sablons", region: "Bretagne", lat: 48.366, lng: -4.766 },
+  { id: "la-palue", name: "La Palue", region: "Bretagne", lat: 48.214, lng: -4.555 },
+  { id: "baie-des-trepasses", name: "Baie des Trépassés", region: "Bretagne", lat: 48.047, lng: -4.708 },
+  { id: "la-torche", name: "La Torche", region: "Bretagne", lat: 47.836, lng: -4.351 },
+  { id: "pors-carn", name: "Pors Carn", region: "Bretagne", lat: 47.818, lng: -4.341 },
+  { id: "guidel", name: "Guidel", region: "Bretagne", lat: 47.759, lng: -3.528 },
+  { id: "sainte-barbe", name: "Sainte-Barbe", region: "Bretagne", lat: 47.604, lng: -3.136 },
+  { id: "port-blanc", name: "Port Blanc (Quiberon)", region: "Bretagne", lat: 47.521, lng: -3.153 },
+
+  // Pays de la Loire
+  { id: "la-baule", name: "La Baule", region: "Pays de la Loire", lat: 47.279, lng: -2.394 },
+  { id: "saint-brevin", name: "Saint-Brévin", region: "Pays de la Loire", lat: 47.236, lng: -2.176 },
+  { id: "la-sauzaie", name: "La Sauzaie", region: "Pays de la Loire", lat: 46.638, lng: -1.868 },
+  { id: "sables-olonne", name: "Les Sables d'Olonne", region: "Pays de la Loire", lat: 46.492, lng: -1.789 },
+  { id: "bud-bud", name: "Bud Bud", region: "Pays de la Loire", lat: 46.417, lng: -1.530 },
+  { id: "la-tranche", name: "La Tranche-sur-Mer", region: "Pays de la Loire", lat: 46.340, lng: -1.442 },
+
+  // Charente-Maritime
+  { id: "petit-bec", name: "Le Petit Bec (Ré)", region: "Nouvelle-Aquitaine", lat: 46.248, lng: -1.547 },
+  { id: "les-grenettes", name: "Les Grenettes (Ré)", region: "Nouvelle-Aquitaine", lat: 46.162, lng: -1.353 },
+  { id: "vert-bois", name: "Vert Bois (Oléron)", region: "Nouvelle-Aquitaine", lat: 45.918, lng: -1.258 },
+  { id: "cote-sauvage", name: "La Côte Sauvage", region: "Nouvelle-Aquitaine", lat: 45.719, lng: -1.233 },
+  { id: "pontaillac", name: "Pontaillac", region: "Nouvelle-Aquitaine", lat: 45.626, lng: -1.040 },
+
+  // Gironde
+  { id: "soulac", name: "Soulac-sur-Mer", region: "Nouvelle-Aquitaine", lat: 45.514, lng: -1.134 },
+  { id: "montalivet", name: "Montalivet", region: "Nouvelle-Aquitaine", lat: 45.378, lng: -1.157 },
+  { id: "hourtin", name: "Hourtin", region: "Nouvelle-Aquitaine", lat: 45.228, lng: -1.168 },
+  { id: "carcans", name: "Carcans", region: "Nouvelle-Aquitaine", lat: 45.081, lng: -1.185 },
+  { id: "lacanau-nord", name: "Lacanau - Nord", region: "Nouvelle-Aquitaine", lat: 44.996, lng: -1.200 },
+  { id: "lacanau-sud", name: "Lacanau - Sud", region: "Nouvelle-Aquitaine", lat: 44.980, lng: -1.200 },
+  { id: "lacanau-super", name: "Lacanau - Super Sud", region: "Nouvelle-Aquitaine", lat: 44.960, lng: -1.202 },
+  { id: "le-porge", name: "Le Porge", region: "Nouvelle-Aquitaine", lat: 44.887, lng: -1.207 },
+  { id: "cap-ferret", name: "Cap Ferret", region: "Nouvelle-Aquitaine", lat: 44.629, lng: -1.250 },
+
+  // Landes
+  { id: "biscarrosse", name: "Biscarrosse", region: "Nouvelle-Aquitaine", lat: 44.444, lng: -1.250 },
+  { id: "mimizan", name: "Mimizan", region: "Nouvelle-Aquitaine", lat: 44.205, lng: -1.296 },
+  { id: "contis", name: "Contis", region: "Nouvelle-Aquitaine", lat: 44.093, lng: -1.320 },
+  { id: "cap-homy", name: "Cap de l'Homy", region: "Nouvelle-Aquitaine", lat: 44.037, lng: -1.332 },
+  { id: "saint-girons", name: "Saint-Girons", region: "Nouvelle-Aquitaine", lat: 43.951, lng: -1.365 },
+  { id: "moliets", name: "Moliets", region: "Nouvelle-Aquitaine", lat: 43.850, lng: -1.391 },
+  { id: "messanges", name: "Messanges", region: "Nouvelle-Aquitaine", lat: 43.816, lng: -1.402 },
+  { id: "vieux-boucau", name: "Vieux-Boucau", region: "Nouvelle-Aquitaine", lat: 43.784, lng: -1.406 },
+  { id: "seignosse-penon", name: "Seignosse - Le Penon", region: "Nouvelle-Aquitaine", lat: 43.707, lng: -1.435 },
+  { id: "seignosse-bourdaines", name: "Seignosse - Les Bourdaines", region: "Nouvelle-Aquitaine", lat: 43.693, lng: -1.438 },
+  { id: "seignosse-estagnots", name: "Seignosse - Les Estagnots", region: "Nouvelle-Aquitaine", lat: 43.681, lng: -1.440 },
+  { id: "hossegor-graviere", name: "Hossegor - La Gravière", region: "Nouvelle-Aquitaine", lat: 43.669, lng: -1.442 },
+  { id: "hossegor-nord", name: "Hossegor - La Nord", region: "Nouvelle-Aquitaine", lat: 43.662, lng: -1.443 },
+  { id: "hossegor-sud", name: "Hossegor - La Sud", region: "Nouvelle-Aquitaine", lat: 43.655, lng: -1.442 },
+  { id: "capbreton-santocha", name: "Capbreton - Le Santocha", region: "Nouvelle-Aquitaine", lat: 43.640, lng: -1.446 },
+  { id: "capbreton-piste", name: "Capbreton - La Piste", region: "Nouvelle-Aquitaine", lat: 43.633, lng: -1.450 },
+  { id: "labenne", name: "Labenne", region: "Nouvelle-Aquitaine", lat: 43.597, lng: -1.465 },
+  { id: "ondres", name: "Ondres", region: "Nouvelle-Aquitaine", lat: 43.578, lng: -1.488 },
+  { id: "tarnos", name: "Tarnos", region: "Nouvelle-Aquitaine", lat: 43.543, lng: -1.517 },
+
+  // Pyrénées-Atlantiques (Basque Coast)
+  { id: "anglet-barre", name: "Anglet - La Barre", region: "Nouvelle-Aquitaine", lat: 43.528, lng: -1.526 },
+  { id: "anglet-cavaliers", name: "Anglet - Les Cavaliers", region: "Nouvelle-Aquitaine", lat: 43.518, lng: -1.531 },
+  { id: "anglet-marinella", name: "Anglet - Marinella", region: "Nouvelle-Aquitaine", lat: 43.504, lng: -1.540 },
+  { id: "anglet-chambre", name: "Anglet - Chambre d'Amour", region: "Nouvelle-Aquitaine", lat: 43.497, lng: -1.545 },
+  { id: "biarritz-grande", name: "Biarritz - Grande Plage", region: "Nouvelle-Aquitaine", lat: 43.483, lng: -1.558 },
+  { id: "biarritz-cotes-basques", name: "Biarritz - Côte des Basques", region: "Nouvelle-Aquitaine", lat: 43.478, lng: -1.567 },
+  { id: "biarritz-marbella", name: "Biarritz - Marbella", region: "Nouvelle-Aquitaine", lat: 43.468, lng: -1.573 },
+  { id: "bidart-ilbarritz", name: "Bidart - Ilbarritz", region: "Nouvelle-Aquitaine", lat: 43.454, lng: -1.578 },
+  { id: "bidart-uhabia", name: "Bidart - Uhabia", region: "Nouvelle-Aquitaine", lat: 43.432, lng: -1.595 },
+  { id: "guethary-parlementia", name: "Guéthary - Parlementia", region: "Nouvelle-Aquitaine", lat: 43.425, lng: -1.606 },
+  { id: "guethary-cenitz", name: "Guéthary - Cenitz", region: "Nouvelle-Aquitaine", lat: 43.416, lng: -1.616 },
+  { id: "saint-jean-lafetenia", name: "Saint-Jean-de-Luz - Lafitenia", region: "Nouvelle-Aquitaine", lat: 43.407, lng: -1.636 },
+  { id: "hendaye", name: "Hendaye", region: "Nouvelle-Aquitaine", lat: 43.376, lng: -1.774 }
+];
+
+fs.writeFileSync('spots.json', JSON.stringify(spots, null, 2));
+console.log('Created spots.json with ' + spots.length + ' spots.');

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html class="dark" lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Carte Active - SWELLSYNC Ultra Pro</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d7ff2",
+                        "background-dark": "#0f172a",
+                        "surface-dark": "#1e293b",
+                    },
+                    fontFamily: { "display": ["Inter", "sans-serif"] }
+                },
+            },
+        }
+    </script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <style>
+        .map-bg {
+            background-image: url('images/ocean_hero_4k.jpg');
+            background-size: cover;
+            background-position: center;
+            filter: grayscale(100%) brightness(0.3) saturate(0) contrast(1.2);
+        }
+
+        #map {
+            z-index: 10;
+        }
+
+        /* Custom Leaflet Dark Theme Overrides */
+        .leaflet-popup-content-wrapper,
+        .leaflet-popup-tip {
+            background-color: #1e293b !important;
+            color: #f1f5f9 !important;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .leaflet-popup-content {
+            margin: 12px;
+        }
+
+        .custom-div-icon {
+            background: none;
+            border: none;
+        }
+
+        .pin {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transform: translateY(-50%);
+            transition: all 0.3s;
+        }
+
+        .pin:hover {
+            transform: translateY(-50%) scale(1.2);
+            z-index: 50 !important;
+        }
+
+        .pulse-ring {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(13, 127, 242, 0.4);
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.3);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
+    </style>
+    <link rel="icon" type="image/png" href="images/logo.svg" />
+</head>
+
+<body class="bg-background-dark text-slate-100 font-display antialiased h-screen flex flex-col overflow-hidden">
+    <header
+        class="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 dark:border-[#223649] bg-white/80 dark:bg-[#101a23]/80 backdrop-blur-lg px-6 py-4 lg:px-10 transition-all duration-300"
+        id="main-header">
+        <div class="flex items-center gap-4 animate-slide-down">
+            <a href="index.html" class="flex items-center gap-2 text-primary hover:scale-105 transition-transform">
+                <img src="images/logo.svg" alt="Logo" class="w-10 h-10 object-contain hover:scale-110 transition-transform animate-float" />
+                <h2 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight">SWELLSYNC</h2>
+            </a>
+        </div>
+        <div class="hidden lg:flex flex-1 justify-center gap-8 animate-slide-down" style="animation-delay: 100ms;">
+            <nav class="flex items-center gap-8 group">
+                <a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-all text-sm font-medium hover:-translate-y-0.5"
+                    href="actus.html">Actus</a>
+                <a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-all text-sm font-medium hover:-translate-y-0.5"
+                    href="index.html#previsions">Prévisions</a>
+                <a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-all text-sm font-medium hover:-translate-y-0.5"
+                    href="webcams.html">Webcams</a>
+                <a class="text-primary font-bold text-sm transition-all flex items-center gap-1 hover:scale-105"
+                    href="#">
+                    <span class="material-symbols-outlined text-sm">diamond</span> Premium
+                </a>
+                <a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-all text-sm font-medium hover:-translate-y-0.5"
+                    href="map.html">Carte Active</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-3 animate-slide-down" style="animation-delay: 200ms;">
+            <button id="theme-toggle"
+                class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center transform hover:rotate-12">
+                <span class="material-symbols-outlined" id="theme-icon">light_mode</span>
+            </button>
+            <button id="nav-login-btn" class="hidden sm:flex h-9 items-center justify-center rounded-lg px-4 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#223649] transition-all hover:scale-105">Connexion</button>
+            <button id="nav-register-btn" class="glass-btn flex h-9 items-center justify-center rounded-lg bg-primary hover:bg-primary-dark px-4 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:scale-105">S'inscrire</button>
+            <button class="lg:hidden p-2 text-slate-600 dark:text-slate-300 hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </div>
+    </header>
+    <main class="flex-1 relative w-full h-full">
+        <!-- Interactive Leaflet Map Container -->
+        <div id="map" class="absolute inset-0 w-full h-full"></div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-[#101a23] border-t border-slate-200 dark:border-[#223649] py-8 mt-auto relative z-30">
+        <div class="max-w-7xl mx-auto px-6 lg:px-10 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                <img src="images/logo.svg" alt="Logo" class="w-6 h-6 object-contain" />
+                <span class="text-sm font-bold">© 2026 SWELLSYNC Ultra Pro. Tous droits réservés.</span>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="#" class="text-sm font-medium text-slate-500 hover:text-primary transition-colors">Confidentialité</a>
+                <a href="#" class="text-sm font-medium text-slate-500 hover:text-primary transition-colors">CGU</a>
+                <a href="admin.html" class="flex items-center gap-1 text-sm font-bold text-slate-400 hover:text-primary transition-colors group">
+                    <span class="material-symbols-outlined text-[18px] group-hover:animate-spin">settings</span> Admin
+                </a>
+            </div>
+        </div>
+    </footer>
+
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize Leaflet map targeting the French Atlantic coast
+            const map = L.map('map', {
+                zoomControl: false // Custom controls position
+            }).setView([45.5, -1.5], 6);
+
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+            // Dark/Satellite styled tile layer (CartoDB Dark Matter)
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+
+            try {
+                // Fetch our static configuration files
+                const [spotsResp, forecastResp] = await Promise.all([
+                    fetch('spots.json'),
+                    fetch('forecast_data.json')
+                ]);
+
+                if (!spotsResp.ok || !forecastResp.ok) {
+                    throw new Error("Impossible de charger les spots ou les données météo");
+                }
+
+                const spots = await spotsResp.json();
+                const forecastData = await forecastResp.json();
+
+                // Generate Custom Icon Profile
+                const customIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `
+                        <div class="pin">
+                            <div class="pulse-ring"></div>
+                            <span class="material-symbols-outlined text-primary text-3xl drop-shadow-lg" style="color: #0d7ff2;">location_on</span>
+                        </div>
+                    `,
+                    iconSize: [30, 42],
+                    iconAnchor: [15, 42],
+                    popupAnchor: [0, -42]
+                });
+
+                // Add pins to map in bulk
+                spots.forEach(spot => {
+                    const data = forecastData[spot.id] || { waveHeight: 'N/A', wavePeriod: '--', windSpeed: '--' };
+                    let waveSize = data.waveHeight ? data.waveHeight.toFixed(1) : 'N/A';
+
+                    const marker = L.marker([spot.lat, spot.lng], { icon: customIcon }).addTo(map);
+
+                    // Simple template fallback for links. If we didn't generate an individual page yet, link to # 
+                    // (we only generated a few HTML files like hossegor, biarritz, but all 60 spots are shown).
+                    const detailsLink = ['hossegor-graviere', 'biarritz-grande', 'latorche', 'seignosse-estagnots'].includes(spot.id)
+                        ? (spot.id.replace(/-.*$/, '') + '.html')
+                        : '#';
+
+                    const popupContent = `
+                        <div class="min-w-[200px] text-sm font-display">
+                            <h3 class="text-base font-bold text-white mb-1 border-b border-slate-700 pb-2">${spot.name}</h3>
+                            <div class="mt-2 grid grid-cols-2 gap-2 text-slate-300">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] text-slate-500 uppercase font-black tracking-widest">Houle (m)</span>
+                                    <span class="font-bold text-primary flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[14px]">waves</span> ${waveSize}
+                                    </span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] text-slate-500 uppercase font-black tracking-widest">Période (s)</span>
+                                    <span class="font-bold text-white flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[14px]">timer</span> ${data.wavePeriod ? Math.round(data.wavePeriod) : '--'}
+                                    </span>
+                                </div>
+                                <div class="flex flex-col mt-1">
+                                    <span class="text-[10px] text-slate-500 uppercase font-black tracking-widest">Vent (km/h)</span>
+                                    <span class="font-bold text-white flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[14px]">air</span> ${data.windSpeed ? Math.round(data.windSpeed) : '--'}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <a href="${detailsLink}" class="block w-full text-center bg-primary hover:bg-[#0b6bc9] text-white text-xs font-bold py-2 rounded transition-colors" ${detailsLink === '#' ? "onclick=\"alert('Page du spot en cours de construction.')\"" : ""}>Voir le spot</a>
+                            </div>
+                        </div>
+                    `;
+
+                    marker.bindPopup(popupContent, {
+                        closeButton: false,
+                        autoPanPadding: [50, 50]
+                    });
+                });
+
+            } catch (error) {
+                console.error("Erreur gmap :", error);
+            }
+        });
+    </script>
+
+
+    <!-- Global Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <div class="relative w-full max-w-md transform rounded-2xl bg-white dark:bg-slate-900 shadow-2xl transition-all scale-95 opacity-0" id="auth-modal-content">
+            
+            <!-- Close Button -->
+            <button id="close-auth" class="absolute right-4 top-4 p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 z-20">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+            <div class="p-8 relative">
+                <!-- Main Auth View -->
+                <div id="auth-main-view">
+                    <!-- Header -->
+                    <div class="text-center mb-6">
+                        <img src="images/logo.svg" alt="SWELLSYNC" class="w-12 h-12 mx-auto mb-4" />
+                        <h3 id="auth-title" class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Rejoindre SWELLSYNC</h3>
+                        <p id="auth-subtitle" class="text-sm text-slate-500">Accédez aux prévisions 100% fiables.</p>
+                    </div>
+
+                    <!-- Social Login -->
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <button type="button" class="social-login-btn flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Google</span>
+                        </button>
+                        <button type="button" class="social-login-btn flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <img src="https://www.svgrepo.com/show/511330/apple-173.svg" class="w-5 h-5 dark:invert" alt="Apple">
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Apple</span>
+                        </button>
+                    </div>
+
+                    <div class="relative flex py-2 items-center mb-6">
+                        <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
+                        <span class="flex-shrink-0 mx-4 text-slate-400 text-xs font-semibold">OU PAR EMAIL / SMS</span>
+                        <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
+                    </div>
+
+                    <!-- Auth Form -->
+                    <form id="global-auth-form" class="space-y-4">
+                        <div id="name-field" class="hidden">
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nom Complet</label>
+                            <input type="text" id="auth-name" class="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary text-slate-900 dark:text-white transition-colors" placeholder="John Doe">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Email ou Téléphone</label>
+                            <input type="text" id="auth-email" required class="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary text-slate-900 dark:text-white transition-colors" placeholder="vous@exemple.com ou 06...">
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Mot de passe</label>
+                                <a href="#" class="text-xs text-primary hover:underline font-medium">Oublié ?</a>
+                            </div>
+                            <input type="password" id="auth-password" class="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary text-slate-900 dark:text-white transition-colors" placeholder="••••••••">
+                        </div>
+
+                        <button type="submit" id="auth-submit-btn" class="w-full py-3.5 bg-primary hover:bg-[#0b6bc9] text-white rounded-lg font-bold shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 mt-6 flex justify-center items-center gap-2">
+                            Continuer <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                        </button>
+                    </form>
+
+                    <!-- Footer Toggle -->
+                    <div class="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
+                        <span id="auth-toggle-text">Déjà un compte ?</span>
+                        <button id="auth-toggle-btn" class="text-primary font-bold hover:underline ml-1">Se connecter</button>
+                    </div>
+                </div>
+
+                <!-- 2FA View (Hidden by default) -->
+                <div id="auth-2fa-view" class="hidden flex-col items-center animate-slide-down">
+                    <button type="button" id="back-to-auth" class="absolute left-6 top-6 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-1 text-sm font-semibold">
+                        <span class="material-symbols-outlined text-lg">arrow_back</span> Retour
+                    </button>
+                    
+                    <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-6 mt-4">
+                        <span class="material-symbols-outlined text-3xl text-primary">lock_person</span>
+                    </div>
+                    <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Vérification A2F</h4>
+                    <p class="text-sm text-slate-500 text-center mb-6" id="2fa-message">Un code à 6 chiffres a été envoyé pour sécuriser votre connexion.</p>
+                    
+                    <form id="form-2fa" class="w-full space-y-4">
+                        <div class="flex gap-2 justify-center mb-4 text-slate-900 dark:text-white">
+                            <input type="text" maxlength="1" class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <input type="text" maxlength="1" class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <input type="text" maxlength="1" class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <input type="text" maxlength="1" class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <input type="text" maxlength="1" class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <input type="text" maxlength="1" class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                        </div>
+                        <button type="submit" class="w-full py-3.5 bg-primary hover:bg-[#0b6bc9] text-white rounded-lg font-bold shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 flex justify-center items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">verified</span> Valider le code
+                        </button>
+                    </form>
+                    <button class="text-sm font-medium text-slate-500 hover:text-primary transition-colors mt-6">Renvoyer le code</button>
+                </div>
+            </div>
+            
+            <!-- Success Overlay -->
+            <div id="auth-success" class="absolute inset-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-300 z-50">
+                <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-4 scale-0 transition-transform duration-500" id="success-icon">
+                    <span class="material-symbols-outlined text-3xl text-emerald-500">check_circle</span>
+                </div>
+                <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Authentification Réussie</h4>
+                <p class="text-sm text-slate-500 mb-6">Redirection sécurisée...</p>
+                <div class="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

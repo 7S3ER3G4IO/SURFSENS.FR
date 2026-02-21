@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Ultra Forecast & Conditions | La Torche</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d7ff2",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#101922",
+                        "surface-dark": "#1a2632",
+                        "border-dark": "#2d3d4d",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .glass-effect {
+            background: rgba(26, 38, 50, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(45, 61, 77, 0.5);
+        }
+
+        .premium-blur {
+            backdrop-filter: blur(8px);
+            background: rgba(16, 25, 34, 0.4);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-300">
+    <!-- Top Navigation Bar -->
+    <header
+        class="sticky top-0 z-50 border-b border-border-dark bg-background-dark/80 backdrop-blur-md px-4 md:px-10 py-3">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2 text-primary">
+                    <span class="material-symbols-outlined text-3xl">waves</span>
+                    <h1 class="text-white text-xl font-black tracking-tighter uppercase">Ultra Forecast</h1>
+                </div>
+                <div
+                    class="hidden md:flex items-center bg-surface-dark rounded-lg px-3 py-1.5 border border-border-dark focus-within:border-primary transition-colors">
+                    <span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+                    <input
+                        class="bg-transparent border-none focus:ring-0 text-sm w-64 placeholder:text-slate-500 text-white"
+                        placeholder="Search breaks (e.g. Pipeline, Teahupo'o)" type="text" />
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button
+                    class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-lg text-sm font-bold hover:bg-primary/20 transition-all">
+                    <span class="material-symbols-outlined text-sm">workspace_premium</span>
+                    GO PRO
+                </button>
+                <div class="flex gap-2">
+                    <button
+                        class="p-2 bg-surface-dark border border-border-dark rounded-lg text-slate-300 hover:text-white transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">notifications</span>
+                    </button>
+                    <button
+                        class="p-2 bg-surface-dark border border-border-dark rounded-lg text-slate-300 hover:text-white transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">account_circle</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="max-w-7xl mx-auto px-4 md:px-10 py-8 space-y-8">
+        <!-- Hero Section: Real-Time Conditions -->
+        <section>
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+                <div>
+                    <h2 class="text-white text-3xl md:text-4xl font-black tracking-tight flex items-center">North Shore,
+                        Oahu</h2><button
+                        class="ml-3 p-2 rounded-lg bg-surface-dark border border-border-dark text-slate-400 hover:text-yellow-400 transition-colors group">
+                        <span class="material-symbols-outlined text-xl group-hover:fill-1">star</span>
+                    </button>
+                    <p class="text-slate-400 flex items-center gap-2 mt-1">
+                        <span class="material-symbols-outlined text-sm">location_on</span>
+                        Pointe de la Torche • Last updated 2 mins ago
+                    </p>
+                </div>
+                <div class="flex gap-2">
+                    <span
+                        class="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-bold border border-green-500/30 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">check_circle</span> FAIR-GOOD
+                    </span>
+                    <span
+                        class="px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-bold border border-primary/30 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs">trending_up</span> RISING
+                    </span>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Swell Widget -->
+                <div
+                    class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:border-primary/50 transition-colors group">
+                    <div class="flex justify-between items-start mb-4">
+                        <p class="text-slate-400 text-sm font-bold uppercase tracking-wider">Primary Swell</p>
+                        <span
+                            class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">water</span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <h3 class="text-white text-4xl font-black">6.5<span class="text-xl font-medium">ft</span></h3>
+                        <p class="text-primary text-lg font-bold">@ 12s</p>
+                    </div>
+                    <p class="text-slate-300 mt-2 font-medium flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary rotate-[315deg]">arrow_upward</span>
+                        NW (310°)
+                    </p>
+                    <div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-primary w-3/4 shadow-[0_0_10px_rgba(13,127,242,0.5)]"></div>
+                    </div>
+                </div>
+                <!-- Wind Widget -->
+                <div
+                    class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:border-primary/50 transition-colors group">
+                    <div class="flex justify-between items-start mb-4">
+                        <p class="text-slate-400 text-sm font-bold uppercase tracking-wider">Wind State</p>
+                        <span
+                            class="material-symbols-outlined text-orange-400 group-hover:scale-110 transition-transform">air</span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <h3 class="text-white text-4xl font-black">12<span class="text-xl font-medium">mph</span></h3>
+                        <p class="text-orange-400 text-lg font-bold">Gusts 18</p>
+                    </div>
+                    <p class="text-slate-300 mt-2 font-medium flex items-center gap-2">
+                        <span class="material-symbols-outlined text-orange-400 rotate-[180deg]">arrow_upward</span>
+                        Offshore SE
+                    </p>
+                    <div class="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-orange-400 w-1/2 shadow-[0_0_10px_rgba(251,146,60,0.5)]"></div>
+                    </div>
+                </div>
+                <!-- Tide Widget -->
+                <div
+                    class="bg-surface-dark border border-border-dark p-6 rounded-xl hover:border-primary/50 transition-colors group">
+                    <div class="flex justify-between items-start mb-4">
+                        <p class="text-slate-400 text-sm font-bold uppercase tracking-wider">Tide Cycle</p>
+                        <span
+                            class="material-symbols-outlined text-blue-300 group-hover:scale-110 transition-transform">waves</span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <h3 class="text-white text-4xl font-black">+2.4<span class="text-xl font-medium">ft</span></h3>
+                        <p class="text-blue-300 text-lg font-bold">Rising</p>
+                    </div>
+                    <p class="text-slate-300 mt-2 font-medium">Next High: 4:15 PM</p>
+                    <div class="mt-4 flex items-end gap-1 h-6">
+                        <div class="bg-slate-700 w-full h-1/2 rounded-sm"></div>
+                        <div class="bg-slate-700 w-full h-2/3 rounded-sm"></div>
+                        <div class="bg-primary w-full h-3/4 rounded-sm"></div>
+                        <div class="bg-slate-700 w-full h-full rounded-sm"></div>
+                        <div class="bg-slate-700 w-full h-3/4 rounded-sm"></div>
+                        <div class="bg-slate-700 w-full h-1/2 rounded-sm"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- 24-Hour Detailed Forecast -->
+        <section class="bg-surface-dark border border-border-dark rounded-xl overflow-hidden">
+            <div class="p-6 border-b border-border-dark flex justify-between items-center">
+                <h3 class="text-white text-xl font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">schedule</span>
+                    24-Hour Detailed Telemetry
+                </h3>
+                <div class="flex gap-2">
+                    <button class="text-xs font-bold px-3 py-1 rounded bg-primary text-white">SWELL</button>
+                    <button
+                        class="text-xs font-bold px-3 py-1 rounded bg-slate-800 text-slate-400 hover:bg-slate-700 transition-colors">WIND</button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="relative h-64 w-full">
+                    <!-- Graph Visualization (Mockup with SVG) -->
+                    <svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 1000 200">
+                        <defs>
+                            <lineargradient id="gradient" x1="0%" x2="0%" y1="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:rgba(13, 127, 242, 0.4); stop-opacity:1"></stop>
+                                <stop offset="100%" style="stop-color:rgba(13, 127, 242, 0); stop-opacity:1"></stop>
+                            </lineargradient>
+                        </defs>
+                        <path
+                            d="M0,150 C100,140 200,120 300,110 C400,100 500,140 600,130 C700,120 800,80 900,70 L1000,60 L1000,200 L0,200 Z"
+                            fill="url(#gradient)"></path>
+                        <path
+                            d="M0,150 C100,140 200,120 300,110 C400,100 500,140 600,130 C700,120 800,80 900,70 L1000,60"
+                            fill="none" stroke="#0d7ff2" stroke-width="3"></path>
+                        <!-- Reference Lines -->
+                        <line stroke="#2d3d4d" stroke-dasharray="4" x1="0" x2="1000" y1="50" y2="50"></line>
+                        <line stroke="#2d3d4d" stroke-dasharray="4" x1="0" x2="1000" y1="100" y2="100"></line>
+                        <line stroke="#2d3d4d" stroke-dasharray="4" x1="0" x2="1000" y1="150" y2="150"></line>
+                    </svg>
+                    <!-- X-Axis Labels -->
+                    <div
+                        class="flex justify-between mt-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2">
+                        <span>06:00 AM</span>
+                        <span>09:00 AM</span>
+                        <span>12:00 PM</span>
+                        <span>03:00 PM</span>
+                        <span>06:00 PM</span>
+                        <span>09:00 PM</span>
+                        <span>12:00 AM</span>
+                    </div>
+                </div>
+            </div>
+        </section><!-- Live HD Camera Section -->
+        <section class="space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="text-white text-xl font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">videocam</span>
+                    Live HD Stream
+                </h3>
+                <div class="flex items-center gap-4">
+                    <span
+                        class="flex items-center gap-1.5 text-xs font-bold text-red-500 bg-red-500/10 px-2.5 py-1 rounded-full">
+                        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> LIVE
+                    </span>
+                    <span class="text-slate-400 text-xs font-bold uppercase tracking-wider">842 VIEWERS</span>
+                </div>
+            </div>
+            <div
+                class="relative aspect-video rounded-xl overflow-hidden border border-border-dark bg-slate-900 group cursor-pointer">
+                <img alt="Live Surf Cam"
+                    class="w-full h-full object-cover opacity-50 group-hover:opacity-60 transition-opacity"
+                    src="images/webcam_hossegor_1771676222239.png" />
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div
+                        class="w-20 h-20 bg-primary/20 backdrop-blur-md rounded-full flex items-center justify-center border border-primary/30 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-white text-5xl fill-1">play_arrow</span>
+                    </div>
+                </div>
+                <div class="absolute top-4 right-4">
+                    <span
+                        class="bg-black/60 backdrop-blur-md text-white text-[10px] font-black px-2 py-1 rounded border border-white/20">4K
+                        ULTRA HD</span>
+                </div>
+                <div class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                    <p class="text-white text-sm font-bold">Main Break - South West Angle</p>
+                </div>
+            </div>
+        </section>
+        <!-- 7-Day Overview Forecast -->
+        <section>
+            <h3 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">calendar_month</span>
+                7-Day Overview
+            </h3>
+            <div class="space-y-2">
+                <!-- Day Row Template -->
+                <div
+                    class="grid grid-cols-4 md:grid-cols-7 items-center bg-surface-dark border border-border-dark p-4 rounded-lg hover:bg-slate-800/50 transition-colors cursor-pointer">
+                    <div class="col-span-1">
+                        <p class="text-white font-bold">MON</p>
+                        <p class="text-slate-500 text-xs">OCT 24</p>
+                    </div>
+                    <div class="hidden md:flex flex-col items-center">
+                        <span class="material-symbols-outlined text-primary text-xl">water_drop</span>
+                        <p class="text-white font-bold">6-8ft</p>
+                    </div>
+                    <div class="hidden md:flex flex-col items-center">
+                        <span class="material-symbols-outlined text-orange-400 text-xl">air</span>
+                        <p class="text-white font-bold">8mph</p>
+                    </div>
+                    <div class="col-span-1 md:col-span-2 flex flex-col md:items-center">
+                        <div class="flex gap-1 text-primary">
+                            <span class="material-symbols-outlined text-sm fill-1">star</span>
+                            <span class="material-symbols-outlined text-sm fill-1">star</span>
+                            <span class="material-symbols-outlined text-sm fill-1">star</span>
+                            <span class="material-symbols-outlined text-sm fill-1">star</span>
+                            <span class="material-symbols-outlined text-sm">star</span>
+                        </div>
+                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-tighter">Very Good</p>
+                    </div>
+                    <div class="col-span-2 md:col-span-2 text-right">
+                        <p class="text-white font-medium text-sm">AM: Clean Glassy</p>
+                        <p class="text-slate-500 text-xs">PM: Light Onshore</p>
+                    </div>
+                </div>
+                <!-- Day Row 2 -->
+                <div
+                    class="grid grid-cols-4 md:grid-cols-7 items-center bg-surface-dark border border-border-dark p-4 rounded-lg hover:bg-slate-800/50 transition-colors">
+                    <div class="col-span-1">
+                        <p class="text-white font-bold">TUE</p>
+                        <p class="text-slate-500 text-xs">OCT 25</p>
+                    </div>
+                    <div class="hidden md:flex flex-col items-center">
+                        <span class="material-symbols-outlined text-primary text-xl">water_drop</span>
+                        <p class="text-white font-bold">8-12ft</p>
+                    </div>
+                    <div class="hidden md:flex flex-col items-center">
+                        <span class="material-symbols-outlined text-red-400 text-xl">air</span>
+                        <p class="text-white font-bold">22mph</p>
+                    </div>
+                    <div class="col-span-1 md:col-span-2 flex flex-col md:items-center">
+                        <div class="flex gap-1 text-slate-600">
+                            <span class="material-symbols-outlined text-sm fill-1 text-primary">star</span>
+                            <span class="material-symbols-outlined text-sm fill-1 text-primary">star</span>
+                            <span class="material-symbols-outlined text-sm">star</span>
+                            <span class="material-symbols-outlined text-sm">star</span>
+                            <span class="material-symbols-outlined text-sm">star</span>
+                        </div>
+                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-tighter">Poor-Fair</p>
+                    </div>
+                    <div class="col-span-2 md:col-span-2 text-right">
+                        <p class="text-white font-medium text-sm">AM: Heavy Swell</p>
+                        <p class="text-slate-500 text-xs">PM: Stormy Winds</p>
+                    </div>
+                </div>
+                <!-- Day Row 3 -->
+                <div
+                    class="grid grid-cols-4 md:grid-cols-7 items-center bg-surface-dark border border-border-dark p-4 rounded-lg hover:bg-slate-800/50 transition-colors">
+                    <div class="col-span-1">
+                        <p class="text-white font-bold">WED</p>
+                        <p class="text-slate-500 text-xs">OCT 26</p>
+                    </div>
+                    <div class="hidden md:flex flex-col items-center">
+                        <span class="material-symbols-outlined text-primary text-xl">water_drop</span>
+                        <p class="text-white font-bold">10-15ft</p>
+                    </div>
+                    <div class="hidden md:flex flex-col items-center">
+                        <span class="material-symbols-outlined text-green-400 text-xl">air</span>
+                        <p class="text-white font-bold">12mph</p>
+                    </div>
+                    <div class="col-span-1 md:col-span-2 flex flex-col md:items-center">
+                        <div class="flex gap-1 text-primary">
+                            <span class="material-symbols-outlined text-sm fill-1">star</span>
+                            <span class="material-symbols-outlined text-sm fill-1">star</span>
+                            <span class="material-symbols-outlined text-sm fill-1">star</span>
+                            <span class="material-symbols-outlined text-sm fill-1">star</span>
+                            <span class="material-symbols-outlined text-sm fill-1">star</span>
+                        </div>
+                        <p class="text-primary text-[10px] font-bold uppercase tracking-tighter">EPIC</p>
+                    </div>
+                    <div class="col-span-2 md:col-span-2 text-right">
+                        <p class="text-white font-medium text-sm">AM: XL Pumping</p>
+                        <p class="text-slate-500 text-xs">PM: Perfect Offshore</p>
+                    </div>
+                </div>
+            </div>
+        </section><!-- Analytics Section -->
+        <section class="space-y-6">
+            <div class="bg-surface-dark border border-border-dark rounded-xl p-6">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="p-3 bg-red-500/20 rounded-xl border border-red-500/30 text-red-400">
+                        <span class="material-symbols-outlined text-3xl">waves</span>
+                    </div>
+                    <div>
+                        <h3 class="text-white text-xl font-black uppercase tracking-tight">MAUVAIS</h3>
+                        <p class="text-slate-400">Vent de mer dégradé.</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <!-- Quiver Analysis -->
+                    <div
+                        class="bg-background-dark/50 border border-border-dark p-4 rounded-xl text-center group hover:border-primary/50 transition-colors">
+                        <span class="material-symbols-outlined text-primary mb-2">surfing</span>
+                        <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">QUIVER-ANALYTICS</p>
+                        <p class="text-white font-bold">Gun / Step-up</p>
+                        <p class="text-slate-500 text-[10px] mt-1">Planche conseillée</p>
+                    </div>
+                    <!-- Crowd Predict -->
+                    <div
+                        class="bg-background-dark/50 border border-border-dark p-4 rounded-xl text-center group hover:border-primary/50 transition-colors">
+                        <span class="material-symbols-outlined text-red-500 mb-2">group</span>
+                        <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">CROWD-PREDICT</p>
+                        <p class="text-white font-bold flex items-center justify-center gap-1">Saturé <span
+                                class="w-2 h-2 rounded-full bg-red-500"></span></p>
+                        <p class="text-slate-500 text-[10px] mt-1">Affluence estimée</p>
+                    </div>
+                    <!-- Feel Real -->
+                    <div
+                        class="bg-background-dark/50 border border-border-dark p-4 rounded-xl text-center group hover:border-primary/50 transition-colors">
+                        <span class="material-symbols-outlined text-orange-400 mb-2">thermostat</span>
+                        <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">FEEL-REAL</p>
+                        <p class="text-white font-bold">14°C</p>
+                        <p class="text-slate-500 text-[10px] mt-1">Temp. ressentie</p>
+                    </div>
+                    <!-- Solar Sync -->
+                    <div
+                        class="bg-background-dark/50 border border-border-dark p-4 rounded-xl text-center group hover:border-primary/50 transition-colors">
+                        <span class="material-symbols-outlined text-yellow-400 mb-2">light_mode</span>
+                        <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">SOLAR-SYNC</p>
+                        <p class="text-white font-bold flex items-center justify-center gap-1">Nuageux <span
+                                class="material-symbols-outlined text-sm">cloud</span></p>
+                        <p class="text-slate-500 text-[10px] mt-1">Ciel &amp; UV</p>
+                    </div>
+                    <!-- Eco Scan -->
+                    <div
+                        class="bg-background-dark/50 border border-border-dark p-4 rounded-xl text-center group hover:border-primary/50 transition-colors">
+                        <span class="material-symbols-outlined text-teal-400 mb-2">dna</span>
+                        <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">ECO-SCAN</p>
+                        <p class="text-white font-bold flex items-center justify-center gap-1">Eau Claire <span
+                                class="material-symbols-outlined text-sm text-blue-400">water_drop</span></p>
+                        <p class="text-slate-500 text-[10px] mt-1">Qualité de l'eau</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Premium Section: 16-Day Forecast Teaser -->
+        <section class="relative rounded-xl overflow-hidden border border-primary/30">
+            <div class="p-6 border-b border-border-dark bg-surface-dark">
+                <h3 class="text-white text-xl font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">analytics</span>
+                    16-Day Extended Modeling
+                </h3>
+            </div>
+            <div class="premium-blur p-8 flex flex-col items-center text-center relative">
+                <!-- Blurred Data Mockup -->
+                <div class="absolute inset-0 opacity-20 flex justify-around items-end px-12 pb-12 pointer-events-none">
+                    <div class="bg-primary w-12 h-32 rounded-t-lg"></div>
+                    <div class="bg-primary w-12 h-48 rounded-t-lg"></div>
+                    <div class="bg-primary w-12 h-24 rounded-t-lg"></div>
+                    <div class="bg-primary w-12 h-56 rounded-t-lg"></div>
+                    <div class="bg-primary w-12 h-40 rounded-t-lg"></div>
+                    <div class="bg-primary w-12 h-36 rounded-t-lg"></div>
+                </div>
+                <div class="z-10 max-w-md">
+                    <div class="mb-6 inline-flex p-3 bg-primary/20 rounded-full border border-primary/40 text-primary">
+                        <span class="material-symbols-outlined text-4xl">lock_open</span>
+                    </div>
+                    <h4 class="text-white text-3xl font-black mb-4">Unlock the Super-Forecaster</h4>
+                    <p class="text-slate-300 mb-8 leading-relaxed">
+                        Get ahead of the pack with our proprietary 16-day advanced swell modeling.
+                        Precise tracking of long-range ocean disturbances before they reach the buoy network.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 text-left">
+                        <div class="flex items-start gap-2">
+                            <span class="material-symbols-outlined text-primary text-sm mt-1">check_circle</span>
+                            <p class="text-xs text-slate-300 font-medium">16-Day Extended Outlook</p>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="material-symbols-outlined text-primary text-sm mt-1">check_circle</span>
+                            <p class="text-xs text-slate-300 font-medium">High-Res Wind Modeling</p>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="material-symbols-outlined text-primary text-sm mt-1">check_circle</span>
+                            <p class="text-xs text-slate-300 font-medium">Buoy Trigger Alerts</p>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="material-symbols-outlined text-primary text-sm mt-1">check_circle</span>
+                            <p class="text-xs text-slate-300 font-medium">Exclusive Break Analysis</p>
+                        </div>
+                    </div>
+                    <button
+                        class="w-full py-4 bg-primary hover:bg-primary/90 text-white font-black text-lg rounded-xl shadow-[0_0_20px_rgba(13,127,242,0.4)] transition-all transform hover:scale-[1.02]">
+                        UPGRADE TO PREMIUM
+                    </button>
+                    <p class="text-slate-500 text-xs mt-4">Only $9.99/mo. Cancel anytime.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="border-t border-border-dark mt-12 py-12 px-10">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex items-center gap-2 text-slate-500">
+                <span class="material-symbols-outlined">waves</span>
+                <span class="font-black uppercase tracking-tighter text-sm">Ultra Forecast © 2024</span>
+            </div>
+            <nav class="flex gap-8">
+                <a class="text-slate-500 hover:text-primary transition-colors text-sm font-bold uppercase tracking-widest"
+                    href="#">Pricing</a>
+                <a class="text-slate-500 hover:text-primary transition-colors text-sm font-bold uppercase tracking-widest"
+                    href="#">Methodology</a>
+                <a class="text-slate-500 hover:text-primary transition-colors text-sm font-bold uppercase tracking-widest"
+                    href="#">API</a>
+                <a class="text-slate-500 hover:text-primary transition-colors text-sm font-bold uppercase tracking-widest"
+                    href="#">Support</a>
+            </nav>
+            <div class="flex gap-4">
+                <button
+                    class="p-2 border border-border-dark rounded-lg text-slate-500 hover:border-primary hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined">share</span>
+                </button>
+                <button
+                    class="p-2 border border-border-dark rounded-lg text-slate-500 hover:border-primary hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined">language</span>
+                </button>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

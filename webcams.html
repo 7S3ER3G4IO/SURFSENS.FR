@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html class="dark" lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Webcams HD - SWELLSYNC Ultra Pro</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d7ff2",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#0f172a",
+                        "surface-dark": "#1e293b",
+                        "surface-darker": "#0b1120",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-in-right': 'slideInRight 0.4s ease-out forwards'
+                    },
+                    keyframes: {
+                        slideInRight: {
+                            '0%': { transform: 'translateX(20px)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            scroll-behavior: smooth;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0b1120;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0d7ff2;
+        }
+
+        .cam-grid-item {
+            transition: all 0.3s ease;
+        }
+
+        .cam-grid-item:hover {
+            transform: scale(1.02);
+            z-index: 10;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border-color: #0d7ff2;
+        }
+
+        .live-indicator::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.5);
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Overlay UI for Pro Panel */
+        .pro-panel-overlay {
+            background: linear-gradient(to top, rgba(11, 17, 32, 0.95) 0%, rgba(11, 17, 32, 0.4) 50%, rgba(11, 17, 32, 0.8) 100%);
+        }
+
+        .target-crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .target-crosshair::before,
+        .target-crosshair::after {
+            content: '';
+            position: absolute;
+            background: white;
+        }
+
+        .target-crosshair::before {
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+        }
+
+        .target-crosshair::after {
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+        }
+
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 10;
+            position: absolute;
+            pointer-events: none;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(13, 127, 242, 0.1) 50%, rgba(0, 0, 0, 0) 100%);
+            opacity: 0.1;
+            animation: scanline 8s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% {
+                transform: translateY(-100px);
+            }
+
+            100% {
+                transform: translateY(800px);
+            }
+        }
+    </style>
+    <link rel="icon" type="image/png" href="images/logo.svg" />
+</head>
+
+<body
+    class="bg-background-dark text-slate-100 font-display antialiased min-h-screen flex flex-col overflow-hidden selection:bg-primary selection:text-white">
+
+    <!-- Header -->
+    <header
+        class="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 dark:border-[#223649] bg-white/80 dark:bg-[#101a23]/80 backdrop-blur-lg px-6 py-4 lg:px-10 transition-all duration-300 shrink-0"
+        id="main-header">
+        <div class="flex items-center gap-4 animate-slide-down">
+            <a href="index.html" class="flex items-center gap-2 text-primary hover:scale-105 transition-transform">
+                <img src="images/logo.svg" alt="Logo" class="w-10 h-10 object-contain hover:scale-110 transition-transform animate-float" />
+                <h2 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight">SWELLSYNC</h2>
+            </a>
+        </div>
+        <div class="hidden lg:flex flex-1 justify-center gap-8 animate-slide-down" style="animation-delay: 100ms;">
+            <nav class="flex items-center gap-8 group">
+                <a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-all text-sm font-medium hover:-translate-y-0.5"
+                    href="actus.html">Actus</a>
+                <a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-all text-sm font-medium hover:-translate-y-0.5"
+                    href="index.html#previsions">Prévisions</a>
+                <a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-all text-sm font-medium hover:-translate-y-0.5"
+                    href="webcams.html">Webcams</a>
+                <a class="text-primary font-bold text-sm transition-all flex items-center gap-1 hover:scale-105"
+                    href="#">
+                    <span class="material-symbols-outlined text-sm">diamond</span> Premium
+                </a>
+                <a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-all text-sm font-medium hover:-translate-y-0.5"
+                    href="map.html">Carte Active</a>
+            </nav>
+        </div>
+        <div class="flex items-center gap-3 animate-slide-down" style="animation-delay: 200ms;">
+            <button id="theme-toggle"
+                class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center transform hover:rotate-12">
+                <span class="material-symbols-outlined" id="theme-icon">light_mode</span>
+            </button>
+            <button id="nav-login-btn" class="hidden sm:flex h-9 items-center justify-center rounded-lg px-4 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#223649] transition-all hover:scale-105">Connexion</button>
+            <button id="nav-register-btn" class="glass-btn flex h-9 items-center justify-center rounded-lg bg-primary hover:bg-primary-dark px-4 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:scale-105">S'inscrire</button>
+            <button class="lg:hidden p-2 text-slate-600 dark:text-slate-300 hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden h-full">
+
+        <!-- Left Sidebar: Cam List -->
+        <aside class="w-80 bg-surface-dark border-r border-slate-800 flex flex-col h-full shrink-0 z-20">
+            <div class="p-4 border-b border-slate-800 bg-surface-darker/50">
+                <div class="relative w-full">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                        <span class="material-symbols-outlined text-[18px]">search</span>
+                    </span>
+                    <input
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg py-2 pl-10 pr-4 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-colors"
+                        placeholder="Filtrer les caméras..." type="text" id="camSearch" />
+                </div>
+                <div class="flex gap-2 mt-3 overflow-x-auto hide-scrollbar">
+                    <button
+                        class="px-3 py-1 bg-primary text-white text-[10px] font-bold uppercase tracking-wider rounded border border-primary">Toutes</button>
+                    <button
+                        class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold uppercase tracking-wider rounded border border-slate-700 transition">Landes</button>
+                    <button
+                        class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold uppercase tracking-wider rounded border border-slate-700 transition">Basque</button>
+                    <button
+                        class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold uppercase tracking-wider rounded border border-slate-700 transition">Bretagne</button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-3 space-y-3" id="camList">
+                <!-- Cam Item 1 -->
+                <div class="cam-list-item cursor-pointer group bg-slate-900 rounded-xl overflow-hidden border-2 border-primary shadow-lg"
+                    onclick="switchCam('Hossegor - La Gravière', 'images/webcam_hossegor_1771676222239.png', 'live', '1.8-2.5m', '15km/h Est', 'hossegor.html')">
+                    <div class="h-24 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                            style="background-image: url('images/webcam_hossegor_1771676222239.png')">
+                        </div>
+                        <div
+                            class="absolute top-2 left-2 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded text-[9px] font-bold text-white border border-white/10">
+                            <span class="size-1.5 rounded-full bg-red-500 animate-pulse"></span> EN DIRECT
+                        </div>
+                    </div>
+                    <div class="p-3 bg-gradient-to-t from-slate-900 to-slate-800">
+                        <div class="flex justify-between items-center mb-1">
+                            <h4 class="text-sm font-bold text-white">Hossegor - La Gravière</h4>
+                        </div>
+                        <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono">
+                            <span>43.67°N, -1.44°W</span>
+                            <span class="text-primary font-bold">ACTIF</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cam Item 2 -->
+                <div class="cam-list-item cursor-pointer group bg-slate-800/50 hover:bg-slate-800 rounded-xl overflow-hidden border border-slate-700 hover:border-slate-500 transition-colors"
+                    onclick="switchCam('Biarritz - Côte des Basques', 'images/webcam_biarritz_1771676235733.png', 'live', '1-1.5m', '10km/h Sud', 'biarritz.html')">
+                    <div class="h-24 relative overflow-hidden opacity-80 group-hover:opacity-100 transition-opacity">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                            style="background-image: url('images/webcam_biarritz_1771676235733.png')">
+                        </div>
+                        <div
+                            class="absolute top-2 left-2 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded text-[9px] font-bold text-white border border-white/10">
+                            <span class="size-1.5 rounded-full bg-red-500 animate-pulse"></span> EN DIRECT
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <div class="flex justify-between items-center mb-1">
+                            <h4 class="text-sm font-bold text-slate-200 group-hover:text-white transition-colors">
+                                Biarritz - Côte des Basques</h4>
+                        </div>
+                        <div class="flex items-center justify-between text-[10px] text-slate-500 font-mono">
+                            <span>43.47°N, -1.56°W</span>
+                            <span class="text-emerald-500 font-bold">ACTIF</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cam Item 3 -->
+                <div class="cam-list-item cursor-pointer group bg-slate-800/50 hover:bg-slate-800 rounded-xl overflow-hidden border border-slate-700 hover:border-slate-500 transition-colors"
+                    onclick="switchCam('Seignosse - Les Estagnots', 'images/webcam_hossegor_1771676222239.png', 'live', '2m', '18km/h Est', 'seignosse.html')">
+                    <div class="h-24 relative overflow-hidden opacity-80 group-hover:opacity-100 transition-opacity">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                            style="background-image: url('images/webcam_hossegor_1771676222239.png'); filter: hue-rotate(20deg) brightness(0.9);">
+                        </div>
+                        <div
+                            class="absolute top-2 left-2 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded text-[9px] font-bold text-white border border-white/10">
+                            <span class="size-1.5 rounded-full bg-red-500 animate-pulse"></span> EN DIRECT
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <h4 class="text-sm font-bold text-slate-200 group-hover:text-white mb-1">Seignosse - Les
+                            Estagnots</h4>
+                        <div class="flex items-center justify-between text-[10px] text-slate-500 font-mono">
+                            <span>43.69°N, -1.43°W</span>
+                            <span class="text-emerald-500 font-bold">ACTIF</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cam Item 4 (Offline/Go Surf emulation) -->
+                <div class="cam-list-item cursor-pointer group bg-slate-900 border border-red-900/50 rounded-xl overflow-hidden"
+                    onclick="switchCam('Lacanau - Plage Centrale', '', 'offline', '--', '--', '#')">
+                    <div class="h-24 bg-slate-800 flex flex-col items-center justify-center relative overflow-hidden">
+                        <div
+                            class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiMxZTI5M2IiLz48cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjMGYxNzJhIi8+PC9zdmc+')] opacity-50">
+                        </div>
+                        <span class="material-symbols-outlined text-slate-600 text-3xl mb-1">videocam_off</span>
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Signal Perdu</span>
+                    </div>
+                    <div class="p-3 border-t border-red-900/30">
+                        <h4 class="text-sm font-bold text-slate-400 mb-1">Lacanau - Centrale</h4>
+                        <div class="flex items-center justify-between text-[10px] font-mono">
+                            <span class="text-slate-600">45.00°N, -1.20°W</span>
+                            <span class="text-red-500 font-bold animate-pulse">HORS LIGNE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cam Item 5 -->
+                <div class="cam-list-item cursor-pointer group bg-slate-800/50 hover:bg-slate-800 rounded-xl overflow-hidden border border-slate-700 hover:border-slate-500 transition-colors"
+                    onclick="switchCam('La Torche', 'images/ocean_hero_4k.jpg', 'live', '2.5m', '35km/h W', 'latorche.html')">
+                    <div class="h-24 relative overflow-hidden opacity-80 group-hover:opacity-100 transition-opacity">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                            style="background-image: url('images/ocean_hero_4k.jpg'); filter: saturate(0.8) contrast(1.1);">
+                        </div>
+                        <div
+                            class="absolute top-2 left-2 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded text-[9px] font-bold text-white border border-white/10">
+                            <span class="size-1.5 rounded-full bg-orange-500 animate-pulse"></span> DIFFÉRÉ (-5m)
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <h4 class="text-sm font-bold text-slate-200 group-hover:text-white mb-1">La Torche - Finistère
+                        </h4>
+                        <div class="flex items-center justify-between text-[10px] text-slate-500 font-mono">
+                            <span>47.83°N, -4.35°W</span>
+                            <span class="text-orange-500 font-bold">ACTIF</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Player Area -->
+        <main class="flex-1 relative bg-black flex flex-col items-center justify-center overflow-hidden">
+
+            <!-- Video Layer (Simulation) -->
+            <div id="mainPlayerBg"
+                class="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out scale-100"
+                style="background-image: url('images/webcam_hossegor_1771676222239.png');">
+            </div>
+
+            <!-- Offline Screen (Hidden by default) -->
+            <div id="offlineScreen"
+                class="absolute inset-0 bg-slate-900 z-10 hidden flex-col items-center justify-center">
+                <div
+                    class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiMxZTI5M2IiLz48cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjMGYxNzJhIi8+PC9zdmc+')] opacity-30">
+                </div>
+                <span class="material-symbols-outlined text-slate-700 text-6xl mb-4 animate-pulse">videocam_off</span>
+                <h2 class="text-2xl font-black text-slate-400 tracking-widest uppercase mb-2">Perte de Signal</h2>
+                <p class="text-slate-500 font-mono text-sm">Tentative de reconnexion automatique...</p>
+                <button
+                    class="mt-6 px-6 py-2 border border-slate-600 hover:border-white text-slate-300 hover:text-white rounded-lg transition text-xs font-bold uppercase tracking-widest bg-surface-darker/50 backdrop-blur">
+                    Bascule Go Surf
+                </button>
+            </div>
+
+            <div class="scanline"></div>
+
+            <!-- Pro Panel UI Overlays (Only visible when Live) -->
+            <div id="liveUIOverlay" class="absolute inset-0 z-20 pointer-events-none">
+                <!-- Top HUD -->
+                <div
+                    class="absolute top-0 inset-x-0 h-32 pro-panel-overlay flex justify-between items-start p-6 pointer-events-auto transition-transform hover:translate-y-0 -translate-y-2">
+                    <div>
+                        <div class="flex items-center gap-3 mb-1">
+                            <span class="flex h-3 w-3 relative">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span
+                                    class="relative inline-flex rounded-full h-3 w-3 bg-red-600 border border-black overflow-hidden"></span>
+                            </span>
+                            <h1 class="text-3xl font-black text-white drop-shadow-lg tracking-tight" id="mainCamTitle">
+                                Hossegor - La Gravière</h1>
+                        </div>
+                        <div class="flex items-center gap-4 text-xs font-mono font-bold text-slate-300 drop-shadow">
+                            <span class="bg-black/50 px-2 py-1 rounded border border-white/10">CAM 01</span>
+                            <span>4K UHD 60FPS</span>
+                            <span class="text-primary" id="currentTime">14:24:05 CET</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="bg-black/60 backdrop-blur-md border border-white/10 rounded-xl p-3 flex gap-4 pointer-events-auto">
+                            <div class="text-center">
+                                <span class="material-symbols-outlined text-white text-[18px]">water</span>
+                                <div class="text-lg font-black text-white leading-none mt-1" id="hudWave">1.8-2.5m</div>
+                            </div>
+                            <div class="w-px bg-white/20"></div>
+                            <div class="text-center">
+                                <span class="material-symbols-outlined text-white text-[18px]">air</span>
+                                <div class="text-lg font-black text-white leading-none mt-1" id="hudWind">15km/h E</div>
+                            </div>
+                        </div>
+                        <button id="reportBtn"
+                            class="bg-primary/90 hover:bg-primary backdrop-blur text-white px-4 py-3 rounded-xl shadow-lg border border-primary-dark transition-all font-bold hover:scale-105 pointer-events-auto flex flex-col items-center justify-center"
+                            onclick="window.location.href='hossegor.html'">
+                            <span class="material-symbols-outlined text-sm mb-0.5">analytics</span>
+                            <span class="text-[10px] uppercase tracking-wider">Report</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Focus Crosshair -->
+                <div class="target-crosshair"></div>
+
+                <!-- Bottom Control Deck -->
+                <div
+                    class="absolute bottom-0 inset-x-0 pro-panel-overlay p-6 flex flex-col justify-end pointer-events-auto">
+
+                    <div class="flex justify-between items-end mb-4 animate-slide-in-right">
+                        <!-- Left tools -->
+                        <div class="flex gap-2">
+                            <button
+                                class="bg-black/50 hover:bg-primary/50 text-white p-2.5 rounded-lg border border-white/10 transition-colors tooltip"
+                                title="Capturer Image">
+                                <span class="material-symbols-outlined text-[20px]">photo_camera</span>
+                            </button>
+                            <button
+                                class="bg-black/50 hover:bg-primary/50 text-white p-2.5 rounded-lg border border-white/10 transition-colors tooltip"
+                                title="Mode Nuit (IR)">
+                                <span class="material-symbols-outlined text-[20px]">visibility</span>
+                            </button>
+                        </div>
+
+                        <!-- Center PTZ Controls Mock -->
+                        <div
+                            class="bg-black/60 backdrop-blur-md rounded-2xl border border-white/10 p-2 flex items-center gap-1 shadow-2xl">
+                            <button
+                                class="text-slate-400 hover:text-white hover:bg-white/10 px-4 py-1.5 rounded-lg text-xs font-bold transition-colors">VUE
+                                LARGE</button>
+                            <div class="w-px h-4 bg-white/20"></div>
+                            <button
+                                class="bg-white/20 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-sm transition-colors">PIC
+                                NORD</button>
+                            <div class="w-px h-4 bg-white/20"></div>
+                            <button
+                                class="text-slate-400 hover:text-white hover:bg-white/10 px-4 py-1.5 rounded-lg text-xs font-bold transition-colors">PIC
+                                SUD</button>
+
+                            <div class="flex items-center gap-2 ml-4 px-2 border-l border-white/20">
+                                <span class="material-symbols-outlined text-slate-400 text-[16px]">remove</span>
+                                <div class="w-24 h-1.5 bg-slate-700 rounded-full overflow-hidden cursor-pointer">
+                                    <div class="w-1/3 h-full bg-primary relative">
+                                        <div
+                                            class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full">
+                                        </div>
+                                    </div>
+                                </div>
+                                <span class="material-symbols-outlined text-slate-400 text-[16px]">add</span>
+                            </div>
+                        </div>
+
+                        <!-- Right Info -->
+                        <div
+                            class="flex items-center gap-2 bg-black/50 border border-white/10 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-300">
+                            <span class="material-symbols-outlined text-green-400 text-[16px]">group</span>
+                            <span id="viewerCount">842 en ligne</span>
+                        </div>
+                    </div>
+
+                    <!-- Timeline / Scrubber -->
+                    <div
+                        class="bg-black/70 backdrop-blur rounded-xl border border-white/10 overflow-hidden flex items-center">
+                        <button
+                            class="bg-primary hover:bg-primary-dark text-white px-4 py-3 flex items-center justify-center transition-colors border-r border-black/50">
+                            <span class="material-symbols-outlined">pause</span>
+                        </button>
+                        <div class="flex-1 px-4 py-2 relative group cursor-pointer">
+                            <div
+                                class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            </div>
+                            <div class="h-1.5 w-full bg-slate-700/50 rounded-full overflow-hidden">
+                                <div class="h-full bg-primary w-[98%]"></div>
+                            </div>
+                            <div
+                                class="absolute bottom-1 left-[25%] -translate-x-1/2 flex flex-col items-center opacity-50 hover:opacity-100">
+                                <span class="h-1.5 w-0.5 bg-yellow-400 mb-0.5"></span>
+                                <span class="text-[8px] text-yellow-400 font-bold uppercase">Barrel (14:10)</span>
+                            </div>
+                            <div
+                                class="absolute bottom-1 left-[70%] -translate-x-1/2 flex flex-col items-center opacity-50 hover:opacity-100">
+                                <span class="h-1.5 w-0.5 bg-white mb-0.5"></span>
+                                <span class="text-[8px] text-white font-bold uppercase">Wipeout (14:20)</span>
+                            </div>
+                        </div>
+                        <span
+                            class="text-xs font-mono font-bold text-red-500 px-4 flex items-center gap-1 bg-white/5 py-3 border-l border-white/10 shadow-inner">
+                            EN DIRECT
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-[#101a23] border-t border-slate-200 dark:border-[#223649] py-8 mt-auto relative z-30">
+        <div class="max-w-7xl mx-auto px-6 lg:px-10 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                <img src="images/logo.svg" alt="Logo" class="w-6 h-6 object-contain" />
+                <span class="text-sm font-bold">© 2026 SWELLSYNC Ultra Pro. Tous droits réservés.</span>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="#" class="text-sm font-medium text-slate-500 hover:text-primary transition-colors">Confidentialité</a>
+                <a href="#" class="text-sm font-medium text-slate-500 hover:text-primary transition-colors">CGU</a>
+                <a href="admin.html" class="flex items-center gap-1 text-sm font-bold text-slate-400 hover:text-primary transition-colors group">
+                    <span class="material-symbols-outlined text-[18px] group-hover:animate-spin">settings</span> Admin
+                </a>
+            </div>
+        </div>
+    </footer>
+
+
+    </div>
+
+    <script>
+        // Live Time Update
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('currentTime').innerText = now.toLocaleTimeString('fr-FR', { hour12: false }) + ' CET';
+        }, 1000);
+
+        // Random Viewer Count Fluctuation
+        let viewers = 842;
+        setInterval(() => {
+            viewers += Math.floor(Math.random() * 5) - 2;
+            document.getElementById('viewerCount').innerText = viewers + ' en ligne';
+        }, 3000);
+
+        // Switch Camera Logic
+        function switchCam(title, imageSrc, status, wave, wind, link) {
+            // Reset active states in sidebar
+            document.querySelectorAll('.cam-list-item').forEach(el => {
+                el.classList.remove('border-2', 'border-primary', 'shadow-lg');
+                if (!el.classList.contains('border-red-900/50')) {
+                    el.classList.add('border', 'border-slate-700');
+                }
+            });
+
+            // Add active state to clicked item
+            const clickedItem = event.currentTarget;
+            clickedItem.classList.remove('border', 'border-slate-700');
+            clickedItem.classList.add('border-2', 'border-primary', 'shadow-lg');
+
+            const mainBg = document.getElementById('mainPlayerBg');
+            const offlineScreen = document.getElementById('offlineScreen');
+            const liveUI = document.getElementById('liveUIOverlay');
+
+            if (status === 'offline') {
+                offlineScreen.classList.remove('hidden');
+                offlineScreen.classList.add('flex');
+                liveUI.classList.add('hidden');
+                mainBg.style.opacity = '0';
+            } else {
+                offlineScreen.classList.add('hidden');
+                offlineScreen.classList.remove('flex');
+                liveUI.classList.remove('hidden');
+
+                // Simulating switching
+                mainBg.style.transform = 'scale(1.05)';
+                mainBg.style.opacity = '0.5';
+
+                setTimeout(() => {
+                    mainBg.style.backgroundImage = `url('${imageSrc}')`;
+                    document.getElementById('mainCamTitle').innerText = title;
+                    document.getElementById('hudWave').innerText = wave;
+                    document.getElementById('hudWind').innerText = wind;
+                    document.getElementById('reportBtn').onclick = () => { window.location.href = link; };
+
+                    mainBg.style.transform = 'scale(1)';
+                    mainBg.style.opacity = '1';
+
+                    // Randomize viewers for new cam
+                    viewers = Math.floor(Math.random() * 900) + 100;
+                }, 300);
+            }
+        }
+    </script>
+
+
+    <!-- Global Auth Modal -->
+    <div id="auth-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <div class="relative w-full max-w-md transform rounded-2xl bg-white dark:bg-slate-900 shadow-2xl transition-all scale-95 opacity-0" id="auth-modal-content">
+            
+            <!-- Close Button -->
+            <button id="close-auth" class="absolute right-4 top-4 p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 z-20">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+            <div class="p-8 relative">
+                <!-- Main Auth View -->
+                <div id="auth-main-view">
+                    <!-- Header -->
+                    <div class="text-center mb-6">
+                        <img src="images/logo.svg" alt="SWELLSYNC" class="w-12 h-12 mx-auto mb-4" />
+                        <h3 id="auth-title" class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Rejoindre SWELLSYNC</h3>
+                        <p id="auth-subtitle" class="text-sm text-slate-500">Accédez aux prévisions 100% fiables.</p>
+                    </div>
+
+                    <!-- Social Login -->
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <button type="button" class="social-login-btn flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Google</span>
+                        </button>
+                        <button type="button" class="social-login-btn flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <img src="https://www.svgrepo.com/show/511330/apple-173.svg" class="w-5 h-5 dark:invert" alt="Apple">
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Apple</span>
+                        </button>
+                    </div>
+
+                    <div class="relative flex py-2 items-center mb-6">
+                        <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
+                        <span class="flex-shrink-0 mx-4 text-slate-400 text-xs font-semibold">OU PAR EMAIL / SMS</span>
+                        <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
+                    </div>
+
+                    <!-- Auth Form -->
+                    <form id="global-auth-form" class="space-y-4">
+                        <div id="name-field" class="hidden">
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nom Complet</label>
+                            <input type="text" id="auth-name" class="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary text-slate-900 dark:text-white transition-colors" placeholder="John Doe">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Email ou Téléphone</label>
+                            <input type="text" id="auth-email" required class="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary text-slate-900 dark:text-white transition-colors" placeholder="vous@exemple.com ou 06...">
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Mot de passe</label>
+                                <a href="#" class="text-xs text-primary hover:underline font-medium">Oublié ?</a>
+                            </div>
+                            <input type="password" id="auth-password" class="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary text-slate-900 dark:text-white transition-colors" placeholder="••••••••">
+                        </div>
+
+                        <button type="submit" id="auth-submit-btn" class="w-full py-3.5 bg-primary hover:bg-[#0b6bc9] text-white rounded-lg font-bold shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 mt-6 flex justify-center items-center gap-2">
+                            Continuer <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                        </button>
+                    </form>
+
+                    <!-- Footer Toggle -->
+                    <div class="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
+                        <span id="auth-toggle-text">Déjà un compte ?</span>
+                        <button id="auth-toggle-btn" class="text-primary font-bold hover:underline ml-1">Se connecter</button>
+                    </div>
+                </div>
+
+                <!-- 2FA View (Hidden by default) -->
+                <div id="auth-2fa-view" class="hidden flex-col items-center animate-slide-down">
+                    <button type="button" id="back-to-auth" class="absolute left-6 top-6 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-1 text-sm font-semibold">
+                        <span class="material-symbols-outlined text-lg">arrow_back</span> Retour
+                    </button>
+                    
+                    <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-6 mt-4">
+                        <span class="material-symbols-outlined text-3xl text-primary">lock_person</span>
+                    </div>
+                    <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Vérification A2F</h4>
+                    <p class="text-sm text-slate-500 text-center mb-6" id="2fa-message">Un code à 6 chiffres a été envoyé pour sécuriser votre connexion.</p>
+                    
+                    <form id="form-2fa" class="w-full space-y-4">
+                        <div class="flex gap-2 justify-center mb-4 text-slate-900 dark:text-white">
+                            <input type="text" maxlength="1" class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <input type="text" maxlength="1" class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <input type="text" maxlength="1" class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <input type="text" maxlength="1" class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <input type="text" maxlength="1" class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <input type="text" maxlength="1" class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                        </div>
+                        <button type="submit" class="w-full py-3.5 bg-primary hover:bg-[#0b6bc9] text-white rounded-lg font-bold shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 flex justify-center items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">verified</span> Valider le code
+                        </button>
+                    </form>
+                    <button class="text-sm font-medium text-slate-500 hover:text-primary transition-colors mt-6">Renvoyer le code</button>
+                </div>
+            </div>
+            
+            <!-- Success Overlay -->
+            <div id="auth-success" class="absolute inset-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-300 z-50">
+                <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-4 scale-0 transition-transform duration-500" id="success-icon">
+                    <span class="material-symbols-outlined text-3xl text-emerald-500">check_circle</span>
+                </div>
+                <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Authentification Réussie</h4>
+                <p class="text-sm text-slate-500 mb-6">Redirection sécurisée...</p>
+                <div class="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

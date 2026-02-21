@@ -1,0 +1,371 @@
+{
+  "_meta": {
+    "timestamp": "2026-02-21T17:00:30.319Z",
+    "activeRobots": 124,
+    "globalReliability": "100.00",
+    "updateFrequencyMs": 1000,
+    "systemStatus": "OPTIMAL"
+  },
+  "spots": {
+    "blancs-sablons": {
+      "waveHeight": "1.50",
+      "wavePeriod": 7.7,
+      "windSpeed": "10.3",
+      "reliability": "100.00"
+    },
+    "la-palue": {
+      "waveHeight": "1.87",
+      "wavePeriod": 7.7,
+      "windSpeed": "8.9",
+      "reliability": "100.00"
+    },
+    "baie-des-trepasses": {
+      "waveHeight": "2.25",
+      "wavePeriod": 7.69,
+      "windSpeed": "10.0",
+      "reliability": "100.00"
+    },
+    "la-torche": {
+      "waveHeight": "2.13",
+      "wavePeriod": 7.21,
+      "windSpeed": "9.1",
+      "reliability": "100.00"
+    },
+    "pors-carn": {
+      "waveHeight": "2.13",
+      "wavePeriod": 7.21,
+      "windSpeed": "9.1",
+      "reliability": "100.00"
+    },
+    "guidel": {
+      "waveHeight": "1.24",
+      "wavePeriod": 5.49,
+      "windSpeed": "6.7",
+      "reliability": "100.00"
+    },
+    "sainte-barbe": {
+      "waveHeight": "1.27",
+      "wavePeriod": 7.47,
+      "windSpeed": "8.5",
+      "reliability": "100.00"
+    },
+    "port-blanc": {
+      "waveHeight": "1.58",
+      "wavePeriod": 7.47,
+      "windSpeed": "8.5",
+      "reliability": "100.00"
+    },
+    "la-baule": {
+      "waveHeight": "1.15",
+      "wavePeriod": 5.9,
+      "windSpeed": "6.3",
+      "reliability": "100.00"
+    },
+    "saint-brevin": {
+      "waveHeight": "1.06",
+      "wavePeriod": 5.68,
+      "windSpeed": "5.2",
+      "reliability": "100.00"
+    },
+    "la-sauzaie": {
+      "waveHeight": "1.02",
+      "wavePeriod": 5.31,
+      "windSpeed": "4.8",
+      "reliability": "100.00"
+    },
+    "sables-olonne": {
+      "waveHeight": "1.33",
+      "wavePeriod": 7.2,
+      "windSpeed": "5.4",
+      "reliability": "100.00"
+    },
+    "bud-bud": {
+      "waveHeight": "0.93",
+      "wavePeriod": 6.69,
+      "windSpeed": "4.7",
+      "reliability": "100.00"
+    },
+    "la-tranche": {
+      "waveHeight": "0.94",
+      "wavePeriod": 6.69,
+      "windSpeed": "5.5",
+      "reliability": "100.00"
+    },
+    "petit-bec": {
+      "waveHeight": "0.94",
+      "wavePeriod": 6.69,
+      "windSpeed": "5.7",
+      "reliability": "100.00"
+    },
+    "les-grenettes": {
+      "waveHeight": "0.72",
+      "wavePeriod": 3.44,
+      "windSpeed": "5.2",
+      "reliability": "100.00"
+    },
+    "vert-bois": {
+      "waveHeight": "1.31",
+      "wavePeriod": 4.59,
+      "windSpeed": "5.0",
+      "reliability": "100.00"
+    },
+    "cote-sauvage": {
+      "waveHeight": "1.31",
+      "wavePeriod": 7.21,
+      "windSpeed": "4.3",
+      "reliability": "100.00"
+    },
+    "pontaillac": {
+      "waveHeight": "1.31",
+      "wavePeriod": 2.27,
+      "windSpeed": "4.3",
+      "reliability": "100.00"
+    },
+    "soulac": {
+      "waveHeight": "1.34",
+      "wavePeriod": 7.4,
+      "windSpeed": "4.2",
+      "reliability": "100.00"
+    },
+    "montalivet": {
+      "waveHeight": "1.31",
+      "wavePeriod": 7.4,
+      "windSpeed": "4.2",
+      "reliability": "100.00"
+    },
+    "hourtin": {
+      "waveHeight": "1.26",
+      "wavePeriod": 8.04,
+      "windSpeed": "3.2",
+      "reliability": "100.00"
+    },
+    "carcans": {
+      "waveHeight": "1.08",
+      "wavePeriod": 8.58,
+      "windSpeed": "2.9",
+      "reliability": "100.00"
+    },
+    "lacanau-nord": {
+      "waveHeight": "1.08",
+      "wavePeriod": 8.58,
+      "windSpeed": "2.9",
+      "reliability": "100.00"
+    },
+    "lacanau-sud": {
+      "waveHeight": "1.08",
+      "wavePeriod": 8.58,
+      "windSpeed": "2.9",
+      "reliability": "100.00"
+    },
+    "lacanau-super": {
+      "waveHeight": "1.13",
+      "wavePeriod": 8.58,
+      "windSpeed": "2.9",
+      "reliability": "100.00"
+    },
+    "le-porge": {
+      "waveHeight": "1.91",
+      "wavePeriod": 8.58,
+      "windSpeed": "2.9",
+      "reliability": "100.00"
+    },
+    "cap-ferret": {
+      "waveHeight": "1.91",
+      "wavePeriod": 9.12,
+      "windSpeed": "3.0",
+      "reliability": "100.00"
+    },
+    "biscarrosse": {
+      "waveHeight": "1.91",
+      "wavePeriod": 9.27,
+      "windSpeed": "3.3",
+      "reliability": "100.00"
+    },
+    "mimizan": {
+      "waveHeight": "2.50",
+      "wavePeriod": 9.37,
+      "windSpeed": "2.3",
+      "reliability": "100.00"
+    },
+    "contis": {
+      "waveHeight": "2.45",
+      "wavePeriod": 9.44,
+      "windSpeed": "0.9",
+      "reliability": "100.00"
+    },
+    "cap-homy": {
+      "waveHeight": "2.45",
+      "wavePeriod": 9.44,
+      "windSpeed": "0.9",
+      "reliability": "100.00"
+    },
+    "saint-girons": {
+      "waveHeight": "2.45",
+      "wavePeriod": 9.44,
+      "windSpeed": "0.9",
+      "reliability": "100.00"
+    },
+    "moliets": {
+      "waveHeight": "2.37",
+      "wavePeriod": 9.2,
+      "windSpeed": "3.5",
+      "reliability": "100.00"
+    },
+    "messanges": {
+      "waveHeight": "2.37",
+      "wavePeriod": 9.2,
+      "windSpeed": "3.5",
+      "reliability": "100.00"
+    },
+    "vieux-boucau": {
+      "waveHeight": "2.37",
+      "wavePeriod": 9.2,
+      "windSpeed": "3.5",
+      "reliability": "100.00"
+    },
+    "seignosse-penon": {
+      "waveHeight": "2.37",
+      "wavePeriod": 9.2,
+      "windSpeed": "3.5",
+      "reliability": "100.00"
+    },
+    "seignosse-bourdaines": {
+      "waveHeight": "2.37",
+      "wavePeriod": 9.2,
+      "windSpeed": "3.5",
+      "reliability": "100.00"
+    },
+    "seignosse-estagnots": {
+      "waveHeight": "2.38",
+      "wavePeriod": 9.2,
+      "windSpeed": "3.5",
+      "reliability": "100.00"
+    },
+    "hossegor-graviere": {
+      "waveHeight": "2.37",
+      "wavePeriod": 9.2,
+      "windSpeed": "3.5",
+      "reliability": "100.00"
+    },
+    "hossegor-nord": {
+      "waveHeight": "2.37",
+      "wavePeriod": 9.2,
+      "windSpeed": "3.5",
+      "reliability": "100.00"
+    },
+    "hossegor-sud": {
+      "waveHeight": "2.37",
+      "wavePeriod": 9.2,
+      "windSpeed": "3.5",
+      "reliability": "100.00"
+    },
+    "capbreton-santocha": {
+      "waveHeight": "2.37",
+      "wavePeriod": 9.2,
+      "windSpeed": "3.5",
+      "reliability": "100.00"
+    },
+    "capbreton-piste": {
+      "waveHeight": "2.38",
+      "wavePeriod": 9.2,
+      "windSpeed": "3.5",
+      "reliability": "100.00"
+    },
+    "labenne": {
+      "waveHeight": "2.38",
+      "wavePeriod": 9.2,
+      "windSpeed": "2.2",
+      "reliability": "100.00"
+    },
+    "ondres": {
+      "waveHeight": "2.37",
+      "wavePeriod": 9.2,
+      "windSpeed": "2.2",
+      "reliability": "100.00"
+    },
+    "tarnos": {
+      "waveHeight": "2.38",
+      "wavePeriod": 9.2,
+      "windSpeed": "2.2",
+      "reliability": "100.00"
+    },
+    "anglet-barre": {
+      "waveHeight": "2.37",
+      "wavePeriod": 9.2,
+      "windSpeed": "2.2",
+      "reliability": "100.00"
+    },
+    "anglet-cavaliers": {
+      "waveHeight": "2.24",
+      "wavePeriod": 9.09,
+      "windSpeed": "2.2",
+      "reliability": "100.00"
+    },
+    "anglet-marinella": {
+      "waveHeight": "2.24",
+      "wavePeriod": 9.09,
+      "windSpeed": "2.2",
+      "reliability": "100.00"
+    },
+    "anglet-chambre": {
+      "waveHeight": "2.24",
+      "wavePeriod": 9.09,
+      "windSpeed": "2.2",
+      "reliability": "100.00"
+    },
+    "biarritz-grande": {
+      "waveHeight": "2.23",
+      "wavePeriod": 9.09,
+      "windSpeed": "2.2",
+      "reliability": "100.00"
+    },
+    "biarritz-cotes-basques": {
+      "waveHeight": "2.24",
+      "wavePeriod": 9.09,
+      "windSpeed": "2.2",
+      "reliability": "100.00"
+    },
+    "biarritz-marbella": {
+      "waveHeight": "2.24",
+      "wavePeriod": 9.09,
+      "windSpeed": "2.2",
+      "reliability": "100.00"
+    },
+    "bidart-ilbarritz": {
+      "waveHeight": "2.24",
+      "wavePeriod": 9.09,
+      "windSpeed": "2.2",
+      "reliability": "100.00"
+    },
+    "bidart-uhabia": {
+      "waveHeight": "2.23",
+      "wavePeriod": 9.09,
+      "windSpeed": "2.2",
+      "reliability": "100.00"
+    },
+    "guethary-parlementia": {
+      "waveHeight": "2.24",
+      "wavePeriod": 9.09,
+      "windSpeed": "2.2",
+      "reliability": "100.00"
+    },
+    "guethary-cenitz": {
+      "waveHeight": "2.24",
+      "wavePeriod": 9.09,
+      "windSpeed": "2.2",
+      "reliability": "100.00"
+    },
+    "saint-jean-lafetenia": {
+      "waveHeight": "2.24",
+      "wavePeriod": 9.09,
+      "windSpeed": "3.7",
+      "reliability": "100.00"
+    },
+    "hendaye": {
+      "waveHeight": "2.24",
+      "wavePeriod": 9.09,
+      "windSpeed": "3.7",
+      "reliability": "100.00"
+    }
+  }
+}

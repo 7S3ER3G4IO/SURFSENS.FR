@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html class="dark" lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>SWELLSYNC - Premium Surf Report</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d7ff2",
+                        "primary-dark": "#0b6bc9",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#101922",
+                        "surface-dark": "#182634",
+                        "surface-light": "#ffffff",
+                        "accent-teal": "#0bda5b",
+                        "accent-orange": "#fa6238",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+                    animation: {
+                        'slide-down': 'slideDown 0.5s ease-out forwards',
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                    },
+                    keyframes: {
+                        slideDown: {
+                            '0%': { transform: 'translateY(-10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 10px rgba(11, 218, 91, 0.4)' },
+                            '50%': { boxShadow: '0 0 20px rgba(11, 218, 91, 0.8)' },
+                        }
+                    }
+                },
+            },
+        }
+    </script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
+        crossorigin="" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        /* Map Pulse Anim */
+        .pulse-ring {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(13, 127, 242, 0.4);
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.3);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1.8);
+                opacity: 0;
+            }
+        }
+
+        /* Leaflet Overrides for Dark Mode */
+        .leaflet-popup-content-wrapper,
+        .leaflet-popup-tip {
+            background-color: #1e293b !important;
+            color: #f1f5f9 !important;
+            border: 1px solid #334155;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .leaflet-popup-content {
+            margin: 12px;
+        }
+
+        .custom-div-icon {
+            background: none;
+            border: none;
+        }
+
+        /* Marker Cluster Custom Style */
+        .marker-cluster-custom {
+            background-color: #101a23;
+            border: 2px solid #0bda5b;
+            color: white;
+            font-weight: 800;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(11, 218, 91, 0.4), inset 0 0 10px rgba(11, 218, 91, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .marker-cluster-custom:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(11, 218, 91, 0.8), inset 0 0 15px rgba(11, 218, 91, 0.4);
+            z-index: 100 !important;
+        }
+
+        .custom-cluster-icon {
+            background: none;
+            border: none;
+        }
+
+        .pin {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transform: translateY(-50%);
+            transition: all 0.3s;
+        }
+
+        .pin:hover {
+            transform: translateY(-50%) scale(1.2);
+            z-index: 50 !important;
+        }
+
+        .spot-card.active {
+            border-color: #0d7ff2 !important;
+            background-color: rgba(13, 127, 242, 0.1) !important;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Interactive Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+        }
+
+        .reveal {
+            animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Interactive Bars */
+        .chart-bar {
+            transform-origin: bottom;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .chart-bar:hover {
+            transform: scaleY(1.05);
+            filter: brightness(1.2);
+        }
+
+        /* Parallax Background */
+        .parallax-bg {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* Glass hover */
+        .glass-btn {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.5s;
+        }
+
+        .glass-btn:hover::after {
+            left: 150%;
+        }
+    </style>
+    <link rel="icon" type="image/png" href="images/logo.svg" />
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased selection:bg-primary selection:text-white transition-colors duration-500">
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+
+        <!-- Header -->
+        <header
+            class="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 dark:border-[#223649] bg-white/80 dark:bg-[#101a23]/80 backdrop-blur-lg px-6 py-4 lg:px-10 transition-all duration-300"
+            id="main-header">
+            <div class="flex items-center gap-4 animate-slide-down">
+                <a href="index.html" class="flex items-center gap-2 text-primary hover:scale-105 transition-transform">
+                    <img src="images/logo.svg" alt="Logo"
+                        class="w-10 h-10 object-contain hover:scale-110 transition-transform animate-float" />
+                    <h2 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight">SWELLSYNC</h2>
+                </a>
+            </div>
+            <div class="hidden lg:flex flex-1 justify-center gap-8 animate-slide-down" style="animation-delay: 100ms;">
+                <nav class="flex items-center gap-8 group">
+                    <a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-all text-sm font-medium hover:-translate-y-0.5"
+                        href="actus.html">Actus</a>
+                    <a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-all text-sm font-medium hover:-translate-y-0.5"
+                        href="#previsions">Prévisions</a>
+                    <a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-all text-sm font-medium hover:-translate-y-0.5"
+                        href="webcams.html">Webcams</a>
+                    <a class="text-primary font-bold text-sm transition-all flex items-center gap-1 hover:scale-105"
+                        href="#">
+                        <span class="material-symbols-outlined text-sm">diamond</span> Premium
+                    </a>
+                    <a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-all text-sm font-medium hover:-translate-y-0.5"
+                        href="map.html">Carte Active</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-3 animate-slide-down" style="animation-delay: 200ms;">
+                <button id="theme-toggle"
+                    class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center transform hover:rotate-12">
+                    <span class="material-symbols-outlined" id="theme-icon">light_mode</span>
+                </button>
+                <button id="nav-login-btn"
+                    class="hidden sm:flex h-9 items-center justify-center rounded-lg px-4 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#223649] transition-all hover:scale-105">Connexion</button>
+                <button id="nav-register-btn"
+                    class="glass-btn flex h-9 items-center justify-center rounded-lg bg-primary hover:bg-primary-dark px-4 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:scale-105">S'inscrire</button>
+                <button class="lg:hidden p-2 text-slate-600 dark:text-slate-300 hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1">
+            <!-- Hero Section -->
+            <section
+                class="relative min-h-[70vh] w-full overflow-hidden flex items-center justify-center group bg-[#0d141e]">
+                <!-- Animated Mesh Gradient Background -->
+                <div class="absolute inset-0 z-0 opacity-80" style="
+                    background: radial-gradient(circle at 15% 50%, rgba(13, 127, 242, 0.4), transparent 50%),
+                                radial-gradient(circle at 85% 30%, rgba(11, 218, 91, 0.25), transparent 50%),
+                                radial-gradient(circle at 50% 80%, rgba(11, 107, 201, 0.3), transparent 50%);
+                    filter: blur(60px);
+                    animation: pulseGlow 8s ease-in-out infinite alternate;
+                "></div>
+
+                <!-- Fine Grain Texture Overlay for Premium Feel -->
+                <div class="absolute inset-0 z-0 opacity-20 mix-blend-overlay pointer-events-none"
+                    style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E');">
+                </div>
+
+                <div class="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-background-light dark:to-background-dark z-10"
+                    style="bottom: -2px;"></div>
+
+                <div class="relative z-50 flex w-full max-w-5xl flex-col items-center gap-10 px-4 text-center mt-8">
+                    <div class="space-y-6 flex flex-col items-center animate-slide-down"
+                        style="animation-delay: 200ms;">
+                        <!-- Pill Badge -->
+                        <div
+                            class="inline-flex items-center gap-3 rounded-full bg-slate-900/40 px-5 py-2 text-xs font-bold text-white backdrop-blur-md border border-white/10 shadow-2xl hover:bg-slate-900/60 hover:border-white/20 transition-all cursor-pointer">
+                            <span class="relative flex h-3 w-3">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-teal opacity-75"></span>
+                                <span
+                                    class="relative inline-flex rounded-full h-3 w-3 bg-accent-teal shadow-[0_0_10px_#0bda5b]"></span>
+                            </span>
+                            Propulsé par une Analyse Avancée
+                        </div>
+
+                        <h1
+                            class="text-5xl md:text-6xl lg:text-8xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-slate-400 drop-shadow-sm leading-tight pb-2">
+                            L'Océan <span
+                                class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent-teal">Décrypté.</span>
+                        </h1>
+
+                        <p class="text-lg md:text-2xl text-slate-300 max-w-3xl mx-auto font-medium leading-relaxed">
+                            Prévisions millimétrées, webcams HD et analyses mathématiques des houles sur toute la côte
+                            Française.
+                        </p>
+                    </div>
+
+                    <!-- Search Bar -->
+                    <div class="w-full max-w-2xl animate-slide-down relative" style="animation-delay: 400ms;">
+                        <div
+                            class="group flex h-16 items-center overflow-hidden rounded-2xl bg-[#182634]/90 backdrop-blur-lg border border-[#314d68]/50 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/50 transition-all shadow-2xl hover:shadow-primary/10">
+                            <div class="flex h-full w-14 items-center justify-center text-slate-400">
+                                <span
+                                    class="material-symbols-outlined text-xl transition-transform group-focus-within:scale-110 group-focus-within:text-primary">search</span>
+                            </div>
+                            <input id="hero-search-input"
+                                class="h-full flex-1 bg-transparent px-2 text-lg text-white placeholder-slate-400 focus:outline-none focus:ring-0 border-none transition-all"
+                                placeholder="Spots: Hossegor, Biarritz, Lacanau..." type="text" autocomplete="off" />
+                            <button
+                                class="mr-2 h-12 rounded-xl bg-primary hover:bg-transparent border border-transparent hover:border-primary px-8 text-sm font-bold text-white transition-all shadow-lg shadow-primary/20 hover:shadow-none">
+                                Chercher
+                            </button>
+                        </div>
+
+                        <!-- Quick Search Dropdown -->
+                        <div id="hero-search-dropdown"
+                            class="absolute top-[calc(100%+8px)] left-0 right-0 bg-[#0f172a]/95 backdrop-blur-xl border border-[#334155]/50 rounded-2xl shadow-2xl overflow-hidden z-[100] max-h-[350px] overflow-y-auto hidden">
+                            <div
+                                class="px-4 py-3 border-b border-[#334155]/50 flex justify-between items-center bg-[#0f172a]/95 sticky top-0 z-10 backdrop-blur-sm">
+                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Résultats
+                                    rapides</span>
+                                <span
+                                    class="text-[9px] px-2 py-0.5 bg-primary/20 text-primary rounded font-bold uppercase tracking-wider border border-primary/30">Premium
+                                    Recherche Premium</span>
+                            </div>
+                            <div id="hero-search-results" class="py-2">
+                                <!-- JS Populated -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Live Reports Section -->
+            <section id="previsions"
+                class="layout-container px-4 sm:px-6 lg:px-8 pt-12 pb-16 relative z-30 bg-transparent">
+                <div class="mx-auto max-w-7xl">
+                    <div
+                        class="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 animate-on-scroll">
+                        <h2
+                            class="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary text-4xl">water</span>
+                            Spots Favoris en Direct
+                        </h2>
+                        <div id="ai-swarm-stats"
+                            class="mt-4 md:mt-0 flex items-center gap-2 text-xs font-bold text-white bg-slate-900/60 backdrop-blur-md px-5 py-2.5 rounded-full border border-slate-700/50 shadow-xl shadow-black/20">
+                            <div class="flex items-center gap-1 text-emerald-400">
+                                <span
+                                    class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse mr-1 shadow-[0_0_8px_#34d399]"></span>
+                                124 Scanners Actifs
+                            </div>
+                            <span class="text-slate-500 mx-2">|</span>
+                            <div class="flex items-center gap-1 text-primary">
+                                <span class="material-symbols-outlined text-sm">precision_manufacturing</span>
+                                PRÉCISION: 100.00%
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Featured Spot Card -->
+                        <div class="lg:col-span-2 group relative overflow-hidden rounded-3xl bg-surface-dark shadow-xl border border-slate-200 dark:border-[#223649] transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:-translate-y-2 cursor-pointer animate-on-scroll"
+                            style="animation-delay: 100ms;" onclick="window.location.href='hossegor.html'">
+                            <div class="absolute inset-0 z-0">
+                                <img alt="Hossegor"
+                                    class="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-[1.03]"
+                                    src="images/webcam_hossegor_1771676222239.png" />
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent">
+                                </div>
+                            </div>
+
+                            <div class="relative z-10 flex h-full flex-col justify-end p-8">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <div class="flex items-center gap-3 mb-2">
+                                            <span
+                                                class="inline-flex items-center gap-1.5 rounded-lg bg-red-500/20 px-2.5 py-1 text-xs font-bold text-red-500 border border-red-500/30 backdrop-blur-sm">
+                                                <span class="h-2 w-2 rounded-full bg-red-500 animate-ping"></span> Live
+                                                HD
+                                            </span>
+                                        </div>
+                                        <h3
+                                            class="text-3xl md:text-4xl font-black text-white group-hover:text-primary transition-colors flex items-center gap-2">
+                                            Hossegor - La Gravière <span
+                                                class="material-symbols-outlined opacity-0 group-hover:opacity-100 transform group-hover:translate-x-2 transition-all">arrow_forward</span>
+                                        </h3>
+                                        <p class="text-slate-300 font-light mt-1">Landes, France</p>
+                                    </div>
+                                    <div class="text-right hidden sm:block">
+                                        <div class="text-5xl font-black text-white tracking-tighter"><span
+                                                id="home-hoss-wave"
+                                                class="inline-block transition-all">1.8-2</span><span
+                                                class="text-2xl align-top font-medium text-slate-400">m</span></div>
+                                        <div class="text-accent-teal font-bold uppercase tracking-widest text-sm mt-1">
+                                            Live</div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-8 grid grid-cols-3 gap-6 border-t border-white/10 pt-6">
+                                    <div
+                                        class="transform group-hover:translate-y-[-4px] transition-transform duration-300 delay-100">
+                                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                                            Vent</p>
+                                        <div class="flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-white"
+                                                style="transform: rotate(90deg);">navigation</span>
+                                            <span class="text-xl font-bold text-white"><span
+                                                    id="home-hoss-wind">15</span><span
+                                                    class="text-sm text-slate-400 font-normal">km/h</span></span>
+                                        </div>
+                                        <p class="text-xs text-slate-400 mt-1">Est (Offshore)</p>
+                                    </div>
+                                    <div
+                                        class="transform group-hover:translate-y-[-4px] transition-transform duration-300 delay-200">
+                                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                                            Marée</p>
+                                        <div class="flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-white">water_drop</span>
+                                            <span class="text-xl font-bold text-white">Descend</span>
+                                        </div>
+                                        <p class="text-xs text-slate-400 mt-1">Basse à 14h20</p>
+                                    </div>
+                                    <div
+                                        class="transform group-hover:translate-y-[-4px] transition-transform duration-300 delay-300">
+                                        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                                            Période</p>
+                                        <div class="flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-white">waves</span>
+                                            <span class="text-xl font-bold text-white"><span
+                                                    id="home-hoss-period">14</span><span
+                                                    class="text-sm text-slate-400 font-normal">s</span></span>
+                                        </div>
+                                        <p class="text-xs text-slate-400 mt-1">Houle WNW</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Spots -->
+                        <div class="flex flex-col gap-4 animate-on-scroll" style="animation-delay: 300ms;">
+                            <div onclick="window.location.href='biarritz.html'"
+                                class="flex-1 rounded-2xl bg-white dark:bg-surface-dark border border-slate-200 dark:border-[#223649] p-5 hover:border-black dark:hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer group">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h4
+                                            class="font-bold text-slate-900 dark:text-white text-lg group-hover:text-primary transition-colors flex items-center gap-1">
+                                            Biarritz <span
+                                                class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">open_in_new</span>
+                                        </h4>
+                                        <p class="text-xs text-slate-500">Côte des Basques</p>
+                                    </div>
+                                    <div class="flex flex-col items-end">
+                                        <span class="text-2xl font-bold text-slate-900 dark:text-white"><span
+                                                id="home-biarritz-wave">1-1.5</span><span
+                                                class="text-sm text-slate-500">m</span></span>
+                                        <span class="text-xs font-bold text-accent-teal">Live</span>
+                                    </div>
+                                </div>
+                                <div
+                                    class="flex items-center justify-between text-sm bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg">
+                                    <div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300"><span
+                                            class="material-symbols-outlined text-[16px]">air</span> <span><span
+                                                id="home-biarritz-wind">10</span>km/h</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300"><span
+                                            class="material-symbols-outlined text-[16px]">water</span>
+                                        <span>Basse</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300"><span
+                                            class="material-symbols-outlined text-[16px]">waves</span> <span><span
+                                                id="home-biarritz-period">10</span>s</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div onclick="window.location.href='latorche.html'"
+                                class="flex-1 rounded-2xl bg-white dark:bg-surface-dark border border-slate-200 dark:border-[#223649] p-5 hover:border-black dark:hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer group">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h4
+                                            class="font-bold text-slate-900 dark:text-white text-lg group-hover:text-primary transition-colors flex items-center gap-1">
+                                            La Torche <span
+                                                class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">open_in_new</span>
+                                        </h4>
+                                        <p class="text-xs text-slate-500">Bretagne</p>
+                                    </div>
+                                    <div class="flex flex-col items-end">
+                                        <span class="text-2xl font-bold text-slate-900 dark:text-white"><span
+                                                id="home-torche-wave">2.5</span><span
+                                                class="text-sm text-slate-500">m</span></span>
+                                        <span class="text-xs font-bold text-slate-500">Live</span>
+                                    </div>
+                                </div>
+                                <div
+                                    class="flex items-center justify-between text-sm bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg">
+                                    <div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300"><span
+                                            class="material-symbols-outlined text-[16px]">air</span> <span>35km/h</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300"><span
+                                            class="material-symbols-outlined text-[16px]">water</span>
+                                        <span>Haute</span>
+                                    </div>
+                                    <div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300"><span
+                                            class="material-symbols-outlined text-[16px]">waves</span> <span>8s</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- New Premium Widgets Section -->
+            <section class="py-4 pb-16 bg-transparent relative z-20">
+                <div class="layout-container px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-on-scroll">
+
+                        <!-- Widget 1: Surf Rating -->
+                        <div
+                            class="relative overflow-hidden rounded-3xl bg-white dark:bg-surface-dark border border-slate-200 dark:border-[#223649] p-6 hover:shadow-2xl hover:border-accent-teal/50 transition-all duration-300 group cursor-pointer">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3
+                                    class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                    Score SWELLSYNC</h3>
+                                <span class="material-symbols-outlined text-accent-teal">auto_awesome</span>
+                            </div>
+                            <div class="flex items-end gap-3">
+                                <span class="text-5xl font-black text-slate-900 dark:text-white">9<span
+                                        class="text-2xl text-slate-400">/10</span></span>
+                                <span class="text-sm font-bold text-emerald-500 mb-2">+1.2 vs hier</span>
+                            </div>
+                            <div class="mt-4 w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                                <div class="bg-accent-teal h-2.5 rounded-full w-[90%] animate-pulse-glow"></div>
+                            </div>
+                            <p class="mt-4 text-xs text-slate-500 font-medium">Conditions Épiques détectées sur la côte
+                                Landaise aujourd'hui.</p>
+                            <div
+                                class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                                <span class="material-symbols-outlined text-9xl">analytics</span>
+                            </div>
+                        </div>
+
+                        <!-- Widget 2: Water & UV -->
+                        <div
+                            class="relative overflow-hidden rounded-3xl bg-white dark:bg-surface-dark border border-slate-200 dark:border-[#223649] p-6 hover:shadow-2xl hover:border-primary/50 transition-all duration-300 group cursor-pointer">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3
+                                    class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                    Océan & Géo</h3>
+                                <span class="material-symbols-outlined text-primary">thermostat</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-1">Temp. Eau</p>
+                                    <span class="text-2xl font-bold text-slate-900 dark:text-white">16°C</span>
+                                    <span class="text-xs text-primary block mt-1"><span
+                                            class="material-symbols-outlined text-[12px] align-middle">arrow_upward</span>
+                                        +0.5°C</span>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400 mb-1">Indice UV</p>
+                                    <span class="text-2xl font-bold text-slate-900 dark:text-white">7</span>
+                                    <span class="text-xs text-accent-orange block mt-1 font-bold">Élevé</span>
+                                </div>
+                            </div>
+                            <div
+                                class="absolute right-0 bottom-0 opacity-10 group-hover:opacity-20 transition-opacity -rotate-12 translate-x-4">
+                                <span class="material-symbols-outlined text-8xl text-primary">sunny</span>
+                            </div>
+                        </div>
+
+                        <!-- Widget 3: Live Radar Map (Concept) -->
+                        <div class="md:col-span-2 relative overflow-hidden rounded-3xl bg-white dark:bg-surface-dark border border-slate-200 dark:border-[#223649] p-0 hover:shadow-2xl hover:border-primary/50 transition-all duration-300 group min-h-[160px] cursor-pointer"
+                            onclick="window.location.href='map.html'">
+                            <div class="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-60 transition-opacity duration-700"
+                                style="background-image: url('images/ocean_hero_4k.jpg'); filter: hue-rotate(180deg) blur(2px);">
+                            </div>
+                            <div
+                                class="absolute inset-0 bg-gradient-to-r from-surface-dark via-surface-dark/80 to-transparent">
+                            </div>
+
+                            <div class="relative z-10 p-6 h-full flex flex-col justify-between">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">Radar Houle 3D
+                                    </h3>
+                                    <span
+                                        class="flex items-center gap-1.5 rounded-full bg-red-500/20 px-2.5 py-1 text-[10px] font-bold text-red-500 border border-red-500/30 backdrop-blur-md">
+                                        <span class="h-2 w-2 rounded-full bg-red-500 animate-ping"></span> Live
+                                    </span>
+                                </div>
+                                <div class="mt-2">
+                                    <div class="flex items-end gap-3">
+                                        <p class="text-4xl font-black text-white">2.8m</p>
+                                        <p class="text-sm font-bold text-primary mb-1.5">@ 12s N-W</p>
+                                    </div>
+                                    <p class="text-xs text-slate-300 mt-2 max-w-[65%] leading-relaxed font-light">
+                                        Nouvelle houle très longue période détectée au large du Golfe de Gascogne par
+                                        nos satellites.</p>
+                                </div>
+
+                                <!-- Abstract map points overlay -->
+                                <div
+                                    class="absolute right-8 top-1/2 -translate-y-1/2 w-24 h-24 hidden sm:block opacity-80 group-hover:scale-110 transition-transform duration-500">
+                                    <div
+                                        class="absolute inset-0 border-[3px] border-white/10 rounded-full animate-[spin_10s_linear_infinite]">
+                                    </div>
+                                    <div
+                                        class="absolute inset-3 border border-primary/50 rounded-full animate-[spin_6s_linear_infinite_reverse]">
+                                    </div>
+                                    <div
+                                        class="absolute inset-8 border border-accent-teal/30 rounded-full animate-[spin_3s_linear_infinite]">
+                                    </div>
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div class="w-2 h-2 bg-accent-teal rounded-full shadow-[0_0_15px_#0bda5b]">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interactive Map Widget Section -->
+            <section class="py-8 bg-transparent relative z-20">
+                <div class="layout-container px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl">
+                    <div
+                        class="bg-surface-dark border border-[#223649] rounded-2xl p-6 shadow-2xl overflow-hidden relative">
+                        <!-- Abstract bg decoration -->
+                        <div
+                            class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none">
+                        </div>
+
+                        <!-- Header -->
+                        <div class="flex items-center justify-between mb-6 relative z-10">
+                            <div>
+                                <h2
+                                    class="text-2xl font-bold bg-gradient-to-r from-accent-teal to-primary bg-clip-text text-transparent">
+                                    Carte interactive</h2>
+                                <p class="text-slate-400 text-sm mt-1">Analyse précise via Stormglass Premium.</p>
+                            </div>
+                            <div
+                                class="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                                <span
+                                    class="material-symbols-outlined text-emerald-500 text-sm animate-pulse">database</span>
+                                <span class="text-xs font-bold text-emerald-500 tracking-wider">DB-Backed</span>
+                            </div>
+                        </div>
+
+                        <!-- Content Layout -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
+                            <!-- Map Area -->
+                            <div
+                                class="lg:col-span-2 relative h-[500px] rounded-xl overflow-hidden border border-[#223649] bg-slate-900 group">
+                                <div id="home-map" class="absolute inset-0 w-full h-full z-10"></div>
+                            </div>
+
+                            <!-- Sidebar Area - NAVIGATION SPOTS -->
+                            <div class="bg-[#101922] border border-[#223649] rounded-xl p-5 flex flex-col h-[500px]">
+                                <h3 class="text-sm font-bold text-primary tracking-widest uppercase mb-4">Navigation
+                                    Spots</h3>
+
+                                <div class="relative mb-4">
+                                    <input type="text" id="spot-search" placeholder="Filtrer les spots..."
+                                        class="w-full bg-surface-dark border border-[#223649] rounded-lg px-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors">
+                                </div>
+
+                                <div id="spots-list" class="flex-1 overflow-y-auto space-y-3 pr-2 hide-scrollbar">
+                                    <!-- Dynamic list items -->
+                                </div>
+
+                                <div class="mt-4 pt-4 border-t border-[#223649]">
+                                    <p class="text-[10px] text-slate-500 font-bold uppercase mb-2 tracking-wider">
+                                        Légende Analyse</p>
+                                    <div class="flex items-center gap-2 mb-1.5">
+                                        <span
+                                            class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
+                                        <span class="text-xs text-slate-400 font-medium">LIVE : Données Satellite
+                                            3h</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 mb-4">
+                                        <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                                        <span class="text-xs text-slate-400 font-medium">WAIT : Calcul en
+                                            cours...</span>
+                                    </div>
+                                    <button
+                                        class="w-full bg-surface-dark border border-emerald-500/30 hover:bg-emerald-500/10 transition-colors text-emerald-500 py-3 rounded-lg flex items-center justify-center gap-2 text-sm font-bold group">
+                                        <span
+                                            class="w-2 h-2 rounded-full bg-emerald-500 group-hover:animate-ping"></span>
+                                        TROUVER MON SPOT
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pro Forecast Section (Animated Tabs) -->
+            <section class="py-16 bg-white dark:bg-[#0b1219] border-t border-slate-200 dark:border-[#223649]">
+                <div class="layout-container px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl">
+                    <div
+                        class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 animate-on-scroll">
+                        <div>
+                            <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">Analyses Météo Pro</h2>
+                            <p class="text-slate-500 text-sm">Modélisations interactives de houle.</p>
+                        </div>
+                        <div class="flex gap-2 p-1 bg-slate-100 dark:bg-[#1a2634] rounded-xl border border-slate-200 dark:border-slate-800"
+                            id="region-tabs">
+                            <button
+                                class="active-tab bg-white dark:bg-[#2a3b4c] text-slate-900 dark:text-white shadow-sm px-6 py-2.5 rounded-lg text-sm font-bold transition-all">Atlantique</button>
+                            <button
+                                class="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-all">Manche</button>
+                            <button
+                                class="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-all">Méditerranée</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Chart Area -->
+                        <div
+                            class="lg:col-span-2 rounded-3xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-[#223649] p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 animate-on-scroll delay-100">
+                            <div class="flex justify-between items-center mb-8">
+                                <h3 class="text-slate-900 dark:text-white font-semibold flex items-center gap-2">
+                                    <span
+                                        class="material-symbols-outlined text-primary p-2 bg-primary/10 rounded-lg">analytics</span>
+                                    Évolution de la houle
+                                </h3>
+                            </div>
+
+                            <!-- Interactive Chart Visualization -->
+                            <div
+                                class="relative h-72 w-full flex items-end justify-between gap-2 px-2 pb-2 border-b border-slate-200 dark:border-slate-700">
+                                <!-- Bars -->
+                                <div class="w-full bg-slate-100 dark:bg-slate-800/50 rounded-t-lg relative group chart-bar"
+                                    style="height: 40%">
+                                    <div class="absolute bottom-0 w-full bg-primary/80 rounded-t-lg group-hover:bg-primary transition-colors"
+                                        style="height: 60%"></div>
+                                    <div
+                                        class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                        1.2m</div>
+                                </div>
+                                <div class="w-full bg-slate-100 dark:bg-slate-800/50 rounded-t-lg relative group chart-bar"
+                                    style="height: 55%">
+                                    <div class="absolute bottom-0 w-full bg-primary/80 rounded-t-lg group-hover:bg-primary transition-colors"
+                                        style="height: 70%"></div>
+                                </div>
+                                <div class="w-full bg-slate-100 dark:bg-slate-800/50 rounded-t-lg relative group chart-bar"
+                                    style="height: 65%">
+                                    <div class="absolute bottom-0 w-full bg-primary/80 rounded-t-lg group-hover:bg-primary transition-colors"
+                                        style="height: 80%"></div>
+                                    <div
+                                        class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                        1.8m</div>
+                                </div>
+                                <div class="w-full bg-slate-100 dark:bg-slate-800/50 rounded-t-lg relative group chart-bar"
+                                    style="height: 80%">
+                                    <div class="absolute bottom-0 w-full bg-emerald-500/80 rounded-t-lg group-hover:bg-emerald-500 transition-colors"
+                                        style="height: 90%"></div>
+                                    <div
+                                        class="absolute -top-10 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                                        PIC: 2.5m</div>
+                                </div>
+                                <div class="w-full bg-slate-100 dark:bg-slate-800/50 rounded-t-lg relative group chart-bar"
+                                    style="height: 90%">
+                                    <div class="absolute bottom-0 w-full bg-emerald-500/80 rounded-t-lg group-hover:bg-emerald-500 transition-colors"
+                                        style="height: 85%"></div>
+                                </div>
+                                <div class="w-full bg-slate-100 dark:bg-slate-800/50 rounded-t-lg relative group chart-bar"
+                                    style="height: 70%">
+                                    <div class="absolute bottom-0 w-full bg-primary/80 rounded-t-lg group-hover:bg-primary transition-colors"
+                                        style="height: 60%"></div>
+                                </div>
+                                <div class="w-full bg-slate-100 dark:bg-slate-800/50 rounded-t-lg relative group chart-bar"
+                                    style="height: 50%">
+                                    <div class="absolute bottom-0 w-full bg-primary/80 rounded-t-lg group-hover:bg-primary transition-colors"
+                                        style="height: 40%"></div>
+                                </div>
+                            </div>
+                            <div
+                                class="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-4 px-2 font-mono">
+                                <span>Lun</span><span>Mar</span><span>Mer</span><span
+                                    class="text-emerald-500 font-bold">Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
+                            </div>
+                        </div>
+
+                        <!-- 16-Day Outlook -->
+                        <div
+                            class="rounded-3xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-[#223649] p-8 shadow-sm flex flex-col animate-on-scroll delay-200">
+                            <h3 class="text-slate-900 dark:text-white font-semibold mb-6">Aperçu de la semaine</h3>
+                            <div class="flex-1 space-y-3">
+                                <div
+                                    class="flex items-center justify-between p-4 rounded-xl dark:bg-[#223649]/30 bg-slate-50 border border-transparent hover:border-slate-300 dark:hover:border-slate-600 transition-all hover:-translate-x-1 cursor-pointer">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 text-center">
+                                            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                                                Lun</div>
+                                            <div class="text-lg font-black text-slate-900 dark:text-white">12</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-bold text-slate-900 dark:text-white">2.0m</div>
+                                            <div class="text-xs text-slate-500">16s WNW</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm font-bold text-accent-teal">Excellent</div>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="flex items-center justify-between p-4 rounded-xl dark:bg-[#223649]/30 bg-slate-50 border border-transparent hover:border-slate-300 dark:hover:border-slate-600 transition-all hover:-translate-x-1 cursor-pointer">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 text-center">
+                                            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                                                Mar</div>
+                                            <div class="text-lg font-black text-slate-900 dark:text-white">13</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-bold text-slate-900 dark:text-white">1.5m</div>
+                                            <div class="text-xs text-slate-500">14s WNW</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm font-bold text-accent-teal">Très Bon</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                class="mt-6 w-full py-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-sm font-bold text-slate-900 dark:text-white transition-colors flex items-center justify-center gap-2 group">
+                                Voir à 16 Jours <span
+                                    class="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer
+            class="bg-white dark:bg-[#101a23] border-t border-slate-200 dark:border-[#223649] py-8 mt-auto relative z-30">
+            <div class="max-w-7xl mx-auto px-6 lg:px-10 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                    <img src="images/logo.svg" alt="Logo" class="w-6 h-6 object-contain" />
+                    <span class="text-sm font-bold">© 2026 SWELLSYNC Ultra Pro. Tous droits réservés.</span>
+                </div>
+                <div class="flex items-center gap-6">
+                    <a href="#"
+                        class="text-sm font-medium text-slate-500 hover:text-primary transition-colors">Confidentialité</a>
+                    <a href="#" class="text-sm font-medium text-slate-500 hover:text-primary transition-colors">CGU</a>
+                    <a href="admin.html"
+                        class="flex items-center gap-1 text-sm font-bold text-slate-400 hover:text-primary transition-colors group">
+                        <span class="material-symbols-outlined text-[18px] group-hover:animate-spin">settings</span>
+                        Admin
+                    </a>
+                </div>
+            </div>
+        </footer>
+        <script>
+            // Interactive Elements JS
+            document.addEventListener('DOMContentLoaded', () => {
+                // Dark Mode
+                const toggleBtn = document.getElementById('theme-toggle');
+                const icon = document.getElementById('theme-icon');
+                const html = document.documentElement;
+
+                toggleBtn.addEventListener('click', () => {
+                    html.classList.toggle('dark');
+                    icon.textContent = html.classList.contains('dark') ? 'light_mode' : 'dark_mode';
+                    icon.style.transform = 'rotate(360deg)';
+                    setTimeout(() => icon.style.transform = 'none', 300);
+                });
+
+                // Header Shrink on Scroll
+                const header = document.getElementById('main-header');
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 50) {
+                        header.classList.add('py-2');
+                        header.classList.remove('py-4');
+                    } else {
+                        header.classList.add('py-4');
+                        header.classList.remove('py-2');
+                    }
+                });
+
+                // Intersection Observer for Reveal Animation
+                const observerOptions = { root: null, rootMargin: "0px", threshold: 0.1 };
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('reveal');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, observerOptions);
+
+                document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+                // Setup Region Tabs interaction
+                const tabs = document.querySelectorAll('#region-tabs button');
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        tabs.forEach(t => {
+                            t.className = 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-all';
+                        });
+                        e.target.className = 'active-tab bg-white dark:bg-[#2a3b4c] text-slate-900 dark:text-white shadow-sm px-6 py-2.5 rounded-lg text-sm font-bold transition-all';
+                    });
+                });
+
+                // Admin Dashboard Shortcut
+                document.addEventListener('keydown', (event) => {
+                    // event.metaKey corresponds to the 'Command' (⌘) key on Mac
+                    if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === 'a') {
+                        event.preventDefault();
+                        window.location.href = 'admin.html';
+                    }
+                });
+            });
+
+            // Dynamic Forecast Integration - AI Swarm Polling
+            async function fetchLiveStream() {
+                try {
+                    const response = await fetch('live_stream.json');
+                    if (!response.ok) return;
+                    const data = await response.json();
+
+                    // Update UI Stats Elements
+                    const aiStatsEl = document.getElementById('ai-swarm-stats');
+                    if (aiStatsEl && data._meta) {
+                        aiStatsEl.innerHTML = `
+                            <span class="flex items-center gap-2"><span class="w-2 h-2 bg-emerald-400 rounded-full animate-ping shadow-[0_0_10px_#34d399]"></span> <span class="text-white">${data._meta.activeRobots} Scanners Actifs</span></span>
+                            <span class="mx-3 text-slate-700">|</span>
+                            <span class="text-emerald-400 font-black uppercase tracking-widest bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/30 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">verified</span> PRÉCISION: ${data._meta.globalReliability}%</span>
+                            <span class="mx-3 text-slate-700">|</span>
+                            <span>${new Date(data._meta.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                        `;
+                    }
+
+                    // Helper to animate updates
+                    const updateValue = (id, newValue) => {
+                        const el = document.getElementById(id);
+                        if (el && el.textContent !== String(newValue)) {
+                            el.textContent = newValue;
+                            el.classList.add('text-accent-teal', 'scale-110');
+                            setTimeout(() => el.classList.remove('text-accent-teal', 'scale-110'), 300);
+                        }
+                    };
+
+                    // Hossegor
+                    if (data.spots['hossegor-graviere']) {
+                        updateValue('home-hoss-wave', data.spots['hossegor-graviere'].waveHeight);
+                        updateValue('home-hoss-wind', data.spots['hossegor-graviere'].windSpeed);
+                    }
+
+                    // Biarritz
+                    if (data.spots['biarritz-grande']) {
+                        updateValue('home-biarritz-wave', data.spots['biarritz-grande'].waveHeight);
+                        updateValue('home-biarritz-wind', data.spots['biarritz-grande'].windSpeed);
+                    }
+
+                    // La Torche
+                    if (data.spots['la-torche']) {
+                        updateValue('home-torche-wave', data.spots['la-torche'].waveHeight);
+                    }
+                } catch (e) {
+                    // Fail silently, retry next tick
+                }
+            }
+
+            // Real-time loop
+            setInterval(fetchLiveStream, 1000);
+            document.addEventListener('DOMContentLoaded', fetchLiveStream);
+        </script>
+    </div>
+
+
+    <!-- Global Auth Modal -->
+    <div id="auth-modal"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        <div class="relative w-full max-w-md transform rounded-2xl bg-white dark:bg-slate-900 shadow-2xl transition-all scale-95 opacity-0"
+            id="auth-modal-content">
+
+            <!-- Close Button -->
+            <button id="close-auth"
+                class="absolute right-4 top-4 p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 z-20">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+            <div class="p-8 relative">
+                <!-- Main Auth View -->
+                <div id="auth-main-view">
+                    <!-- Header -->
+                    <div class="text-center mb-6">
+                        <img src="images/logo.svg" alt="SWELLSYNC" class="w-12 h-12 mx-auto mb-4" />
+                        <h3 id="auth-title" class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Rejoindre
+                            SWELLSYNC</h3>
+                        <p id="auth-subtitle" class="text-sm text-slate-500">Accédez aux prévisions 100% fiables.</p>
+                    </div>
+
+                    <!-- Social Login -->
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <button type="button"
+                            class="social-login-btn flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"
+                                alt="Google">
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Google</span>
+                        </button>
+                        <button type="button"
+                            class="social-login-btn flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+                            <img src="https://www.svgrepo.com/show/511330/apple-173.svg" class="w-5 h-5 dark:invert"
+                                alt="Apple">
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Apple</span>
+                        </button>
+                    </div>
+
+                    <div class="relative flex py-2 items-center mb-6">
+                        <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
+                        <span class="flex-shrink-0 mx-4 text-slate-400 text-xs font-semibold">OU PAR EMAIL / SMS</span>
+                        <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
+                    </div>
+
+                    <!-- Auth Form -->
+                    <form id="global-auth-form" class="space-y-4">
+                        <div id="name-field" class="hidden">
+                            <label
+                                class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Nom
+                                Complet</label>
+                            <input type="text" id="auth-name"
+                                class="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary text-slate-900 dark:text-white transition-colors"
+                                placeholder="John Doe">
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Email
+                                ou Téléphone</label>
+                            <input type="text" id="auth-email" required
+                                class="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary text-slate-900 dark:text-white transition-colors"
+                                placeholder="vous@exemple.com ou 06...">
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label
+                                    class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Mot
+                                    de passe</label>
+                                <a href="#" class="text-xs text-primary hover:underline font-medium">Oublié ?</a>
+                            </div>
+                            <input type="password" id="auth-password"
+                                class="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary text-slate-900 dark:text-white transition-colors"
+                                placeholder="••••••••">
+                        </div>
+
+                        <button type="submit" id="auth-submit-btn"
+                            class="w-full py-3.5 bg-primary hover:bg-[#0b6bc9] text-white rounded-lg font-bold shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 mt-6 flex justify-center items-center gap-2">
+                            Continuer <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                        </button>
+                    </form>
+
+                    <!-- Footer Toggle -->
+                    <div class="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
+                        <span id="auth-toggle-text">Déjà un compte ?</span>
+                        <button id="auth-toggle-btn" class="text-primary font-bold hover:underline ml-1">Se
+                            connecter</button>
+                    </div>
+                </div>
+
+                <!-- 2FA View (Hidden by default) -->
+                <div id="auth-2fa-view" class="hidden flex-col items-center animate-slide-down">
+                    <button type="button" id="back-to-auth"
+                        class="absolute left-6 top-6 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-1 text-sm font-semibold">
+                        <span class="material-symbols-outlined text-lg">arrow_back</span> Retour
+                    </button>
+
+                    <div
+                        class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-6 mt-4">
+                        <span class="material-symbols-outlined text-3xl text-primary">lock_person</span>
+                    </div>
+                    <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Vérification A2F</h4>
+                    <p class="text-sm text-slate-500 text-center mb-6" id="2fa-message">Un code à 6 chiffres a été
+                        envoyé pour sécuriser votre connexion.</p>
+
+                    <form id="form-2fa" class="w-full space-y-4">
+                        <div class="flex gap-2 justify-center mb-4 text-slate-900 dark:text-white">
+                            <input type="text" maxlength="1"
+                                class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <input type="text" maxlength="1"
+                                class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <input type="text" maxlength="1"
+                                class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <input type="text" maxlength="1"
+                                class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <input type="text" maxlength="1"
+                                class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                            <input type="text" maxlength="1"
+                                class="2fa-input w-12 h-14 text-center text-2xl font-bold rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors">
+                        </div>
+                        <button type="submit"
+                            class="w-full py-3.5 bg-primary hover:bg-[#0b6bc9] text-white rounded-lg font-bold shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 flex justify-center items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">verified</span> Valider le code
+                        </button>
+                    </form>
+                    <button
+                        class="text-sm font-medium text-slate-500 hover:text-primary transition-colors mt-6">Renvoyer le
+                        code</button>
+                </div>
+            </div>
+
+            <!-- Success Overlay -->
+            <div id="auth-success"
+                class="absolute inset-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-300 z-50">
+                <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-4 scale-0 transition-transform duration-500"
+                    id="success-icon">
+                    <span class="material-symbols-outlined text-3xl text-emerald-500">check_circle</span>
+                </div>
+                <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Authentification Réussie</h4>
+                <p class="text-sm text-slate-500 mb-6">Redirection sécurisée...</p>
+                <div class="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js" crossorigin=""></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const mapContainer = document.getElementById('home-map');
+            if (!mapContainer || typeof L === 'undefined') return;
+
+            const map = L.map('home-map', { zoomControl: false }).setView([45.5, -1.5], 5);
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+
+            let allSpots = [];
+            let activeMarker = null;
+
+            try {
+                const [spotsResp, forecastResp] = await Promise.all([
+                    fetch('spots.json').catch(() => ({ ok: false })),
+                    fetch('forecast_data.json').catch(() => ({ ok: false }))
+                ]);
+
+                if (spotsResp.ok && forecastResp.ok) {
+                    allSpots = await spotsResp.json();
+                    const forecastData = await forecastResp.json();
+
+
+                    // Initialize Marker Cluster Group with Custom Styling
+                    const markersLayer = L.markerClusterGroup({
+                        chunkedLoading: true,
+                        maxClusterRadius: 60,
+                        spiderfyOnMaxZoom: true,
+                        showCoverageOnHover: false,
+                        iconCreateFunction: function (cluster) {
+                            return L.divIcon({
+                                html: '<div class="marker-cluster-custom w-full h-full">' + cluster.getChildCount() + '</div>',
+                                className: 'custom-cluster-icon',
+                                iconSize: L.point(40, 40)
+                            });
+                        }
+                    });
+
+                    allSpots.forEach(spot => {
+                        const data = forecastData[spot.id] || { waveHeight: 'N/A', wavePeriod: '--', windSpeed: '--' };
+                        let waveSize = data.waveHeight ? data.waveHeight.toFixed(1) : 'N/A';
+
+                        const spotIcon = L.divIcon({
+                            className: 'custom-div-icon',
+                            html: `
+                                <div class="pin" style="justify-content: flex-start; width: max-content;">
+                                    <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 30px; height: 42px;">
+                                        <div class="pulse-ring"></div>
+                                        <span class="material-symbols-outlined text-primary text-3xl drop-shadow-lg" style="color: #0bda5b;">location_on</span>
+                                    </div>
+                                    <span class="ml-1 text-[11px] font-bold text-white whitespace-nowrap drop-shadow-md bg-slate-900/90 px-2 py-1 rounded border border-emerald-500/30 shadow-lg pointer-events-none">
+                                        ${spot.name}
+                                    </span>
+                                </div>
+                            `,
+                            iconSize: [30, 42],
+                            iconAnchor: [15, 42],
+                            popupAnchor: [0, -42]
+                        });
+
+                        const marker = L.marker([spot.lat, spot.lng], { icon: spotIcon });
+                        spot.marker = marker; // Keep reference
+
+                        const detailsLink = ['hossegor-graviere', 'biarritz-grande', 'latorche', 'seignosse-estagnots'].includes(spot.id)
+                            ? (spot.id.replace(/-.*$/, '') + '.html')
+                            : '#';
+
+                        const popupContent = `
+                            <div class="min-w-[200px] text-sm font-display">
+                                <h3 class="text-base font-bold text-white mb-1 border-b border-slate-700 pb-2">${spot.name}</h3>
+                                <div class="mt-2 grid grid-cols-2 gap-2 text-slate-300">
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] text-slate-500 uppercase font-black tracking-widest">Houle (m)</span>
+                                        <span class="font-bold text-primary flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-[14px]">waves</span> ${waveSize}
+                                        </span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] text-slate-500 uppercase font-black tracking-widest">Période (s)</span>
+                                        <span class="font-bold text-white flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-[14px]">timer</span> ${data.wavePeriod ? Math.round(data.wavePeriod) : '--'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <a href="${detailsLink}" class="block w-full text-center bg-primary hover:bg-[#0b6bc9] text-white text-xs font-bold py-2 rounded transition-colors" ${detailsLink === '#' ? "onclick=\"alert('Page en construction')\"" : ""}>Voir le spot</a>
+                                </div>
+                            </div>
+                        `;
+
+                        marker.bindPopup(popupContent, { closeButton: false, autoPanPadding: [50, 50] });
+                        markersLayer.addLayer(marker);
+                    });
+
+                    map.addLayer(markersLayer);
+                    renderSpotsList(allSpots);
+                }
+            } catch (e) { console.error("Map init error:", e); }
+
+            // Sidebar logic
+            const spotSearch = document.getElementById('spot-search');
+            if (spotSearch) {
+                spotSearch.addEventListener('input', (e) => {
+                    const q = e.target.value.toLowerCase();
+                    const filtered = allSpots.filter(s => s.name.toLowerCase().includes(q) || s.region.toLowerCase().includes(q));
+                    renderSpotsList(filtered);
+                });
+            }
+
+            function renderSpotsList(spotsList) {
+                const listEl = document.getElementById('spots-list');
+                if (!listEl) return;
+                listEl.innerHTML = '';
+                spotsList.forEach(spot => {
+                    const el = document.createElement('div');
+                    el.className = 'spot-card p-4 rounded-xl border border-[#223649] hover:border-primary/50 transition-colors bg-surface-dark mb-3 cursor-pointer group';
+                    el.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="text-slate-200 group-hover:text-primary font-bold text-sm mb-1 transition-colors">${spot.name}</h4>
+                                <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">${spot.region}</span>
+                            </div>
+                            <span class="px-2 py-0.5 border border-emerald-500/20 text-emerald-500 rounded text-[10px] font-bold">LIVE</span>
+                        </div>
+                    `;
+                    el.addEventListener('click', () => {
+                        document.querySelectorAll('.spot-card').forEach(n => n.classList.remove('active', 'border-primary'));
+                        el.classList.add('active', 'border-primary');
+                        map.flyTo([spot.lat, spot.lng], 12, { animate: true, duration: 1 });
+                        setTimeout(() => { if (spot.marker) spot.marker.openPopup(); }, 1000);
+                    });
+                    listEl.appendChild(el);
+                });
+            }
+
+            // Hero Search Logic
+            const heroSearchInput = document.getElementById('hero-search-input');
+            const heroSearchDropdown = document.getElementById('hero-search-dropdown');
+            const heroSearchResults = document.getElementById('hero-search-results');
+
+            if (heroSearchInput && heroSearchDropdown && heroSearchResults) {
+                // Perform Search
+                heroSearchInput.addEventListener('input', (e) => {
+                    const q = e.target.value.toLowerCase().trim();
+                    if (!q) {
+                        heroSearchDropdown.classList.add('hidden');
+                        return;
+                    }
+
+                    const filtered = allSpots.filter(s => s.name.toLowerCase().includes(q) || s.region.toLowerCase().includes(q));
+
+                    heroSearchResults.innerHTML = '';
+                    if (filtered.length > 0) {
+                        filtered.forEach(spot => {
+                            const resultEl = document.createElement('div');
+                            resultEl.className = 'px-4 py-3 hover:bg-white/5 cursor-pointer flex items-center justify-between group transition-colors border-b border-white/5 last:border-none';
+                            resultEl.innerHTML = `
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-500 group-hover:text-primary transition-colors">location_on</span>
+                                    <div>
+                                        <h4 class="text-white text-sm font-bold group-hover:text-primary transition-colors">${spot.name}</h4>
+                                        <p class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">${spot.region}</p>
+                                    </div>
+                                </div>
+                                <span class="material-symbols-outlined text-slate-600 group-hover:text-primary text-sm opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0">arrow_forward</span>
+                            `;
+                            resultEl.addEventListener('click', () => {
+                                // Close dropdown
+                                heroSearchDropdown.classList.add('hidden');
+                                heroSearchInput.value = spot.name;
+
+                                // Scroll to map
+                                mapContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                                // Activate spot on map sidebar if it exists
+                                document.querySelectorAll('.spot-card').forEach(n => n.classList.remove('active', 'border-primary'));
+                                const listEl = document.getElementById('spots-list');
+                                if (listEl) {
+                                    Array.from(listEl.children).forEach(card => {
+                                        if (card.querySelector('h4').textContent === spot.name) {
+                                            card.classList.add('active', 'border-primary');
+                                            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                                        }
+                                    });
+                                }
+
+                                map.flyTo([spot.lat, spot.lng], 12, { animate: true, duration: 1.5 });
+                                setTimeout(() => {
+                                    if (spot.marker) spot.marker.openPopup();
+                                }, 1500);
+                            });
+                            heroSearchResults.appendChild(resultEl);
+                        });
+                        heroSearchDropdown.classList.remove('hidden');
+                    } else {
+                        heroSearchResults.innerHTML = `
+                            <div class="px-4 py-6 text-center">
+                                <span class="material-symbols-outlined text-slate-600 text-3xl mb-2">sentiment_dissatisfied</span>
+                                <p class="text-slate-400 text-sm font-medium">Aucun spot trouvé pour "${q}"</p>
+                            </div>
+                        `;
+                        heroSearchDropdown.classList.remove('hidden');
+                    }
+                });
+
+                // Hide dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!heroSearchInput.contains(e.target) && !heroSearchDropdown.contains(e.target)) {
+                        heroSearchDropdown.classList.add('hidden');
+                    }
+                });
+
+                // Show dropdown again if input is focused and not empty
+                heroSearchInput.addEventListener('focus', () => {
+                    if (heroSearchInput.value.trim().length > 0 && heroSearchDropdown.children.length > 0) {
+                        heroSearchDropdown.classList.remove('hidden');
+                    }
+    <!-- Global Toast Container -->
+    <div id="global-toast-container" class="fixed top-4 left-1/2 -translate-x-1/2 z-[200] flex flex-col items-center gap-2 pointer-events-none"></div>
+
+    <script>
+        // Cross-tab Push Notification Listener
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'swellsync_push_alert' && e.newValue) {
+                try {
+                    const alertData = JSON.parse(e.newValue);
+                    if(!alertData.title) return;
+                    
+                    const container = document.getElementById('global-toast-container');
+                    const toast = document.createElement('div');
+                    
+                    let bgClass = "bg-primary";
+                    let icon = "info";
+                    if (alertData.severity === "warning") { bgClass = "bg-amber-500"; icon = "warning"; }
+                    else if (alertData.severity === "critical") { bgClass = "bg-rose-500"; icon = "campaign"; }
+
+                    toast.className = "max-w-md w-max animate-slide-down shadow-2xl rounded-xl p-4 flex gap-4 pointer-events-auto backdrop-blur-md border border-white/20 text-white " + bgClass + " bg-opacity-95";
+                    
+                    let inner = "<div class='flex-shrink-0'><span class='material-symbols-outlined text-3xl animate-pulse'>" + icon + "</span></div>";
+                    inner += "<div class='flex-1'><h4 class='font-bold text-sm tracking-wide uppercase'>" + alertData.title + "</h4>";
+                    if (alertData.body) {
+                        inner += "<p class='text-xs mt-1 text-white/90 leading-relaxed'>" + alertData.body + "</p>";
+                    }
+                    inner += "</div><button class='flex-shrink-0 text-white/70 hover:text-white transition-colors' onclick='this.parentElement.remove()'><span class='material-symbols-outlined text-xl'>close</span></button>";
+                    
+                    toast.innerHTML = inner;
+                    container.appendChild(toast);
+
+                    setTimeout(function() {
+                        if(toast.parentElement) {
+                            toast.classList.replace('animate-slide-down', 'opacity-0');
+                            toast.classList.add('transition-opacity', 'duration-500');
+                            setTimeout(function() { toast.remove(); }, 500);
+                        }
+                    }, 8000);
+                } catch (err) {}
+            }
+        });
+    </script>
+</body>
+
+</html>
