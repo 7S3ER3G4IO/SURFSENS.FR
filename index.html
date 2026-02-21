@@ -931,7 +931,9 @@
             // Dynamic Forecast Integration - AI Swarm Polling
             async function fetchLiveStream() {
                 try {
-                    const response = await fetch('/api/live');
+                    let response;
+                    try { response = await fetch('/api/live'); } catch (e) { }
+                    if (!response || !response.ok) response = await fetch('live_stream.json');
                     if (!response.ok) return;
                     const data = await response.json();
 
@@ -1153,9 +1155,18 @@
             let activeMarker = null;
 
             try {
+                // Try API first, fallback to local JSON files
+                async function fetchWithFallback(apiUrl, jsonFile) {
+                    try {
+                        const r = await fetch(apiUrl);
+                        if (r.ok) return r;
+                    } catch (e) { }
+                    return fetch(jsonFile);
+                }
+
                 const [spotsResp, forecastResp] = await Promise.all([
-                    fetch('/api/spots').catch(() => ({ ok: false })),
-                    fetch('/api/forecasts').catch(() => ({ ok: false }))
+                    fetchWithFallback('/api/spots', 'spots.json'),
+                    fetchWithFallback('/api/forecasts', 'forecast_data.json')
                 ]);
 
                 if (spotsResp.ok && forecastResp.ok) {
