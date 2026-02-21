@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark" lang="fr">
+<html class="dark" lang="fr" style="background-color: #101922;">
 
 <head>
     <meta charset="utf-8" />
@@ -58,9 +58,22 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"
         crossorigin="" />
     <style>
+        html {
+            background-color: #101922;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            background-color: #101922;
+        }
+
+        /* GPU acceleration for smooth scroll */
+        .layout-container,
+        section {
+            will-change: auto;
+            transform: translateZ(0);
         }
 
         /* Map Pulse Anim */
@@ -190,12 +203,17 @@
             filter: brightness(1.2);
         }
 
-        /* Parallax Background */
+        /* Parallax Background - disabled on mobile for perf */
         .parallax-bg {
-            background-attachment: fixed;
             background-position: center;
             background-repeat: no-repeat;
             background-size: cover;
+        }
+
+        @media (min-width: 768px) {
+            .parallax-bg {
+                background-attachment: fixed;
+            }
         }
 
         /* Glass hover */

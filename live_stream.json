@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "timestamp": "2026-02-21T17:14:25.090Z",
+    "timestamp": "2026-02-21T17:24:35.535Z",
     "activeRobots": 124,
     "globalReliability": "100.00",
     "updateFrequencyMs": 1000,
@@ -20,7 +20,7 @@
       "reliability": "100.00"
     },
     "baie-des-trepasses": {
-      "waveHeight": "2.24",
+      "waveHeight": "2.25",
       "wavePeriod": 7.69,
       "windSpeed": "10.0",
       "reliability": "100.00"
@@ -50,13 +50,13 @@
       "reliability": "100.00"
     },
     "port-blanc": {
-      "waveHeight": "1.57",
+      "waveHeight": "1.58",
       "wavePeriod": 7.47,
       "windSpeed": "8.5",
       "reliability": "100.00"
     },
     "la-baule": {
-      "waveHeight": "1.16",
+      "waveHeight": "1.15",
       "wavePeriod": 5.9,
       "windSpeed": "6.3",
       "reliability": "100.00"
@@ -74,7 +74,7 @@
       "reliability": "100.00"
     },
     "sables-olonne": {
-      "waveHeight": "1.34",
+      "waveHeight": "1.33",
       "wavePeriod": 7.2,
       "windSpeed": "5.4",
       "reliability": "100.00"
@@ -86,7 +86,7 @@
       "reliability": "100.00"
     },
     "la-tranche": {
-      "waveHeight": "0.94",
+      "waveHeight": "0.93",
       "wavePeriod": 6.69,
       "windSpeed": "5.5",
       "reliability": "100.00"
@@ -110,7 +110,7 @@
       "reliability": "100.00"
     },
     "cote-sauvage": {
-      "waveHeight": "1.31",
+      "waveHeight": "1.32",
       "wavePeriod": 7.21,
       "windSpeed": "4.3",
       "reliability": "100.00"
@@ -194,7 +194,7 @@
       "reliability": "100.00"
     },
     "cap-homy": {
-      "waveHeight": "2.44",
+      "waveHeight": "2.45",
       "wavePeriod": 9.44,
       "windSpeed": "0.9",
       "reliability": "100.00"
@@ -206,13 +206,13 @@
       "reliability": "100.00"
     },
     "moliets": {
-      "waveHeight": "2.38",
+      "waveHeight": "2.37",
       "wavePeriod": 9.2,
       "windSpeed": "3.5",
       "reliability": "100.00"
     },
     "messanges": {
-      "waveHeight": "2.38",
+      "waveHeight": "2.37",
       "wavePeriod": 9.2,
       "windSpeed": "3.5",
       "reliability": "100.00"
@@ -230,13 +230,13 @@
       "reliability": "100.00"
     },
     "seignosse-bourdaines": {
-      "waveHeight": "2.38",
+      "waveHeight": "2.37",
       "wavePeriod": 9.2,
       "windSpeed": "3.5",
       "reliability": "100.00"
     },
     "seignosse-estagnots": {
-      "waveHeight": "2.38",
+      "waveHeight": "2.37",
       "wavePeriod": 9.2,
       "windSpeed": "3.5",
       "reliability": "100.00"
@@ -260,7 +260,7 @@
       "reliability": "100.00"
     },
     "capbreton-santocha": {
-      "waveHeight": "2.38",
+      "waveHeight": "2.37",
       "wavePeriod": 9.2,
       "windSpeed": "3.5",
       "reliability": "100.00"
@@ -272,7 +272,7 @@
       "reliability": "100.00"
     },
     "labenne": {
-      "waveHeight": "2.37",
+      "waveHeight": "2.38",
       "wavePeriod": 9.2,
       "windSpeed": "2.2",
       "reliability": "100.00"
@@ -290,7 +290,7 @@
       "reliability": "100.00"
     },
     "anglet-barre": {
-      "waveHeight": "2.38",
+      "waveHeight": "2.37",
       "wavePeriod": 9.2,
       "windSpeed": "2.2",
       "reliability": "100.00"
@@ -308,13 +308,13 @@
       "reliability": "100.00"
     },
     "anglet-chambre": {
-      "waveHeight": "2.24",
+      "waveHeight": "2.23",
       "wavePeriod": 9.09,
       "windSpeed": "2.2",
       "reliability": "100.00"
     },
     "biarritz-grande": {
-      "waveHeight": "2.24",
+      "waveHeight": "2.23",
       "wavePeriod": 9.09,
       "windSpeed": "2.2",
       "reliability": "100.00"
@@ -344,19 +344,19 @@
       "reliability": "100.00"
     },
     "guethary-parlementia": {
-      "waveHeight": "2.23",
-      "wavePeriod": 9.09,
-      "windSpeed": "2.2",
-      "reliability": "100.00"
-    },
-    "guethary-cenitz": {
       "waveHeight": "2.24",
       "wavePeriod": 9.09,
       "windSpeed": "2.2",
       "reliability": "100.00"
     },
-    "saint-jean-lafetenia": {
+    "guethary-cenitz": {
       "waveHeight": "2.23",
+      "wavePeriod": 9.09,
+      "windSpeed": "2.2",
+      "reliability": "100.00"
+    },
+    "saint-jean-lafetenia": {
+      "waveHeight": "2.24",
       "wavePeriod": 9.09,
       "windSpeed": "3.7",
       "reliability": "100.00"
