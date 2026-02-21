@@ -7,8 +7,53 @@ const { pool, initDB } = require('./db');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ── Couleurs ANSI ──
+const RESET = '\x1b[0m';
+const BOLD = '\x1b[1m';
+const DIM = '\x1b[2m';
+const WHITE = '\x1b[37m';
+const CYAN = '\x1b[36m';
+const GREEN = '\x1b[32m';
+const YELLOW = '\x1b[33m';
+const RED = '\x1b[31m';
+const MAGENTA = '\x1b[35m';
+const BLUE = '\x1b[34m';
+
+function ts() {
+    return `${DIM}${new Date().toLocaleTimeString('fr-FR', { hour12: false })}${RESET}`;
+}
+
+// ── Compteur de requêtes ──
+let reqCount = 0;
+
 app.use(cors());
 app.use(express.json());
+
+// ── Middleware de logging des requêtes API ──
+app.use('/api', (req, res, next) => {
+    reqCount++;
+    const start = Date.now();
+    const method = req.method;
+    const url = req.originalUrl;
+
+    const methodColors = { GET: GREEN, POST: YELLOW, PUT: BLUE, DELETE: RED };
+    const mColor = methodColors[method] || WHITE;
+
+    // Log entrée
+    console.log(`${ts()} 🌐 ${mColor}${BOLD}${method}${RESET} ${WHITE}${url}${RESET} ${DIM}(req #${reqCount})${RESET}`);
+
+    // Intercepter la fin de réponse pour le temps de réponse
+    const originalEnd = res.end;
+    res.end = function (...args) {
+        const duration = Date.now() - start;
+        const status = res.statusCode;
+        const statusColor = status < 300 ? GREEN : status < 400 ? YELLOW : RED;
+        console.log(`${ts()} 📤 ${statusColor}${status}${RESET} ${WHITE}${url}${RESET} ${DIM}(${duration}ms)${RESET}`);
+        originalEnd.apply(res, args);
+    };
+
+    next();
+});
 
 // Serve all static files (HTML, CSS, JS, images)
 app.use(express.static(path.join(__dirname), {
@@ -24,9 +69,10 @@ app.use(express.static(path.join(__dirname), {
 app.get('/api/spots', async (req, res) => {
     try {
         const result = await pool.query('SELECT id, name, region, lat, lng FROM spots ORDER BY lat DESC');
+        console.log(`${ts()} 🗺️  ${CYAN}SPOTS${RESET} → ${result.rowCount} spots chargés depuis PostgreSQL`);
         res.json(result.rows);
     } catch (err) {
-        console.error('Error fetching spots:', err.message);
+        console.log(`${ts()} ❌ ${RED}ERREUR SPOTS: ${err.message}${RESET}`);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -47,9 +93,10 @@ app.get('/api/forecasts', async (req, res) => {
                 lastUpdated: row.last_updated
             };
         });
+        console.log(`${ts()} 🌤️  ${BLUE}FORECASTS${RESET} → ${result.rowCount} prévisions StormGlass servies`);
         res.json(obj);
     } catch (err) {
-        console.error('Error fetching forecasts:', err.message);
+        console.log(`${ts()} ❌ ${RED}ERREUR FORECASTS: ${err.message}${RESET}`);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -84,7 +131,7 @@ app.get('/api/live', async (req, res) => {
             spots
         });
     } catch (err) {
-        console.error('Error fetching live stream:', err.message);
+        console.log(`${ts()} ❌ ${RED}ERREUR LIVE STREAM: ${err.message}${RESET}`);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -102,9 +149,10 @@ app.post('/api/users', async (req, res) => {
             [name || 'Utilisateur', email]
         );
 
+        console.log(`${ts()} 👤 ${MAGENTA}NOUVEL UTILISATEUR${RESET} → ${BOLD}${name || 'Utilisateur'}${RESET} (${email})`);
         res.json({ success: true, user: result.rows[0] });
     } catch (err) {
-        console.error('Error saving user:', err.message);
+        console.log(`${ts()} ❌ ${RED}ERREUR USER: ${err.message}${RESET}`);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -113,9 +161,10 @@ app.post('/api/users', async (req, res) => {
 app.get('/api/users', async (req, res) => {
     try {
         const result = await pool.query('SELECT id, name, email, created_at, status FROM users ORDER BY created_at DESC');
+        console.log(`${ts()} 👥 ${MAGENTA}USERS${RESET} → ${result.rowCount} utilisateurs récupérés (admin)`);
         res.json(result.rows);
     } catch (err) {
-        console.error('Error fetching users:', err.message);
+        console.log(`${ts()} ❌ ${RED}ERREUR USERS: ${err.message}${RESET}`);
         res.status(500).json({ error: 'Database error' });
     }
 });
@@ -130,18 +179,40 @@ app.get('/{*path}', (req, res) => {
 // ============================
 
 async function startServer() {
-    await initDB();
+    console.log('');
+    console.log(`${CYAN}${BOLD}╔══════════════════════════════════════════════════════════════════╗${RESET}`);
+    console.log(`${CYAN}${BOLD}║                                                                  ║${RESET}`);
+    console.log(`${CYAN}${BOLD}║   🖥️   SWELLSYNC — SERVEUR EXPRESS                              ║${RESET}`);
+    console.log(`${CYAN}${BOLD}║   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━                       ║${RESET}`);
+    console.log(`${CYAN}${BOLD}║   Mode : Production                                             ║${RESET}`);
+    console.log(`${CYAN}${BOLD}║   API : /api/spots, /api/forecasts, /api/live, /api/users       ║${RESET}`);
+    console.log(`${CYAN}${BOLD}║                                                                  ║${RESET}`);
+    console.log(`${CYAN}${BOLD}╚══════════════════════════════════════════════════════════════════╝${RESET}`);
+    console.log('');
 
-    // Start the live buoy computation loop (writes to DB every second)
+    // Init database tables
+    console.log(`${ts()} 🔌 ${YELLOW}Connexion à PostgreSQL...${RESET}`);
+    await initDB();
+    console.log(`${ts()} ✅ ${GREEN}Base de données initialisée avec succès${RESET}`);
+    console.log('');
+
+    // Start the live buoy computation loop (writes to DB every 2s)
+    console.log(`${ts()} 🤖 ${YELLOW}Chargement du moteur de calcul live...${RESET}`);
     require('./live_buoy_db');
 
     app.listen(PORT, () => {
-        console.log(`\n🌊 SWELLSYNC server running on port ${PORT}`);
-        console.log(`   → http://localhost:${PORT}`);
+        console.log('');
+        console.log(`${ts()} ${BOLD}${GREEN}════════════════════════════════════════════${RESET}`);
+        console.log(`${ts()} ${BOLD}${GREEN}  🌊 SWELLSYNC OPÉRATIONNEL — PORT ${PORT}${RESET}`);
+        console.log(`${ts()} ${BOLD}${GREEN}  → http://localhost:${PORT}${RESET}`);
+        console.log(`${ts()} ${BOLD}${GREEN}════════════════════════════════════════════${RESET}`);
+        console.log('');
+        console.log(`${ts()} 📡 En attente de requêtes...`);
+        console.log(`${DIM}${'─'.repeat(72)}${RESET}`);
     });
 }
 
 startServer().catch(err => {
-    console.error('Failed to start server:', err);
+    console.error(`${ts()} ${RED}${BOLD}FATAL: ${err.message}${RESET}`);
     process.exit(1);
 });

@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "timestamp": "2026-02-21T17:41:35.510Z",
+    "timestamp": "2026-02-21T17:47:28.789Z",
     "activeRobots": 124,
     "globalReliability": "100.00",
     "updateFrequencyMs": 1000,
@@ -80,13 +80,13 @@
       "reliability": "100.00"
     },
     "bud-bud": {
-      "waveHeight": "0.93",
+      "waveHeight": "0.94",
       "wavePeriod": 6.69,
       "windSpeed": "4.7",
       "reliability": "100.00"
     },
     "la-tranche": {
-      "waveHeight": "0.93",
+      "waveHeight": "0.94",
       "wavePeriod": 6.69,
       "windSpeed": "5.5",
       "reliability": "100.00"
@@ -122,7 +122,7 @@
       "reliability": "100.00"
     },
     "soulac": {
-      "waveHeight": "1.33",
+      "waveHeight": "1.34",
       "wavePeriod": 7.4,
       "windSpeed": "4.2",
       "reliability": "100.00"
@@ -158,7 +158,7 @@
       "reliability": "100.00"
     },
     "lacanau-super": {
-      "waveHeight": "1.14",
+      "waveHeight": "1.13",
       "wavePeriod": 8.58,
       "windSpeed": "2.9",
       "reliability": "100.00"
@@ -188,7 +188,7 @@
       "reliability": "100.00"
     },
     "contis": {
-      "waveHeight": "2.45",
+      "waveHeight": "2.44",
       "wavePeriod": 9.44,
       "windSpeed": "0.9",
       "reliability": "100.00"
@@ -200,7 +200,7 @@
       "reliability": "100.00"
     },
     "saint-girons": {
-      "waveHeight": "2.44",
+      "waveHeight": "2.45",
       "wavePeriod": 9.44,
       "windSpeed": "0.9",
       "reliability": "100.00"
@@ -212,7 +212,7 @@
       "reliability": "100.00"
     },
     "messanges": {
-      "waveHeight": "2.38",
+      "waveHeight": "2.37",
       "wavePeriod": 9.2,
       "windSpeed": "3.5",
       "reliability": "100.00"
@@ -236,7 +236,7 @@
       "reliability": "100.00"
     },
     "seignosse-estagnots": {
-      "waveHeight": "2.37",
+      "waveHeight": "2.38",
       "wavePeriod": 9.2,
       "windSpeed": "3.5",
       "reliability": "100.00"
@@ -248,7 +248,7 @@
       "reliability": "100.00"
     },
     "hossegor-nord": {
-      "waveHeight": "2.37",
+      "waveHeight": "2.38",
       "wavePeriod": 9.2,
       "windSpeed": "3.5",
       "reliability": "100.00"
@@ -308,7 +308,7 @@
       "reliability": "100.00"
     },
     "anglet-chambre": {
-      "waveHeight": "2.24",
+      "waveHeight": "2.23",
       "wavePeriod": 9.09,
       "windSpeed": "2.2",
       "reliability": "100.00"
@@ -320,7 +320,7 @@
       "reliability": "100.00"
     },
     "biarritz-cotes-basques": {
-      "waveHeight": "2.24",
+      "waveHeight": "2.23",
       "wavePeriod": 9.09,
       "windSpeed": "2.2",
       "reliability": "100.00"
@@ -332,19 +332,19 @@
       "reliability": "100.00"
     },
     "bidart-ilbarritz": {
-      "waveHeight": "2.24",
+      "waveHeight": "2.23",
       "wavePeriod": 9.09,
       "windSpeed": "2.2",
       "reliability": "100.00"
     },
     "bidart-uhabia": {
-      "waveHeight": "2.24",
+      "waveHeight": "2.23",
       "wavePeriod": 9.09,
       "windSpeed": "2.2",
       "reliability": "100.00"
     },
     "guethary-parlementia": {
-      "waveHeight": "2.23",
+      "waveHeight": "2.24",
       "wavePeriod": 9.09,
       "windSpeed": "2.2",
       "reliability": "100.00"
