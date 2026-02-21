@@ -416,36 +416,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = pendingUser.email;
             const name = pendingUser.name;
 
-            // Save to the leads pool for Admin using secure helpers
-            let leads = getLeadsData();
+            // Save user to remote database via API
+            fetch('/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name || 'Utilisateur', email })
+            }).catch(() => { }); // Fire and forget, don't block UI
 
-            // Migrate old leads if they exist
-            if (leads.length === 0) {
-                try {
-                    const oldLeads = JSON.parse(localStorage.getItem('surfsens_leads') || '[]');
-                    if (oldLeads.length > 0) {
-                        leads = oldLeads;
-                        localStorage.removeItem('surfsens_leads');
-                    }
-                } catch (e) { }
-            }
-
-            const existingLeadIndex = leads.findIndex(l => l.email === email);
-
-            if (existingLeadIndex === -1) {
-                leads.push({
-                    name: name || 'Utilisateur',
-                    email: email,
-                    date: new Date().toISOString(),
-                    status: 'Active'
-                });
-                setLeadsData(leads);
-            } else if (!isLoginMode && name) {
-                leads[existingLeadIndex].name = name;
-                setLeadsData(leads);
-            }
-
-            // Set current user session
+            // Set current user session locally for UI display
             localStorage.setItem('surfsens_logged_in_user', JSON.stringify({
                 name: name,
                 email: email

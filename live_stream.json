@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "timestamp": "2026-02-21T17:24:35.535Z",
+    "timestamp": "2026-02-21T17:41:35.510Z",
     "activeRobots": 124,
     "globalReliability": "100.00",
     "updateFrequencyMs": 1000,
@@ -20,7 +20,7 @@
       "reliability": "100.00"
     },
     "baie-des-trepasses": {
-      "waveHeight": "2.25",
+      "waveHeight": "2.24",
       "wavePeriod": 7.69,
       "windSpeed": "10.0",
       "reliability": "100.00"
@@ -50,7 +50,7 @@
       "reliability": "100.00"
     },
     "port-blanc": {
-      "waveHeight": "1.58",
+      "waveHeight": "1.57",
       "wavePeriod": 7.47,
       "windSpeed": "8.5",
       "reliability": "100.00"
@@ -110,7 +110,7 @@
       "reliability": "100.00"
     },
     "cote-sauvage": {
-      "waveHeight": "1.32",
+      "waveHeight": "1.31",
       "wavePeriod": 7.21,
       "windSpeed": "4.3",
       "reliability": "100.00"
@@ -200,7 +200,7 @@
       "reliability": "100.00"
     },
     "saint-girons": {
-      "waveHeight": "2.45",
+      "waveHeight": "2.44",
       "wavePeriod": 9.44,
       "windSpeed": "0.9",
       "reliability": "100.00"
@@ -212,7 +212,7 @@
       "reliability": "100.00"
     },
     "messanges": {
-      "waveHeight": "2.37",
+      "waveHeight": "2.38",
       "wavePeriod": 9.2,
       "windSpeed": "3.5",
       "reliability": "100.00"
@@ -266,13 +266,13 @@
       "reliability": "100.00"
     },
     "capbreton-piste": {
-      "waveHeight": "2.38",
+      "waveHeight": "2.37",
       "wavePeriod": 9.2,
       "windSpeed": "3.5",
       "reliability": "100.00"
     },
     "labenne": {
-      "waveHeight": "2.38",
+      "waveHeight": "2.37",
       "wavePeriod": 9.2,
       "windSpeed": "2.2",
       "reliability": "100.00"
@@ -308,7 +308,7 @@
       "reliability": "100.00"
     },
     "anglet-chambre": {
-      "waveHeight": "2.23",
+      "waveHeight": "2.24",
       "wavePeriod": 9.09,
       "windSpeed": "2.2",
       "reliability": "100.00"
@@ -344,13 +344,13 @@
       "reliability": "100.00"
     },
     "guethary-parlementia": {
-      "waveHeight": "2.24",
+      "waveHeight": "2.23",
       "wavePeriod": 9.09,
       "windSpeed": "2.2",
       "reliability": "100.00"
     },
     "guethary-cenitz": {
-      "waveHeight": "2.23",
+      "waveHeight": "2.24",
       "wavePeriod": 9.09,
       "windSpeed": "2.2",
       "reliability": "100.00"

@@ -936,40 +936,32 @@
                 setInterval(loadLeads, 3000);
             }
 
-            function loadLeads() {
+            async function loadLeads() {
                 const container = document.getElementById('leads-container');
                 if (!container) return;
 
-                // SECURITY CHECK: Only display leads if the admin is properly authenticated
                 if (sessionStorage.getItem('surfsens_admin_auth') !== 'true') {
                     container.innerHTML = '';
                     return;
                 }
 
-                let leads = [];
                 try {
-                    const data = localStorage.getItem('_sf_ss_p'); // encoded key
-                    if (data) {
-                        leads = JSON.parse(decodeURIComponent(escape(atob(data))));
+                    const res = await fetch('/api/users');
+                    const leads = await res.json();
+
+                    container.innerHTML = '';
+
+                    if (leads.length === 0) {
+                        container.innerHTML = '<p class="text-sm text-slate-400 italic">Aucun utilisateur inscrit pour le moment.</p>';
+                        return;
                     }
-                } catch (e) { }
 
-                container.innerHTML = '';
+                    leads.forEach(lead => {
+                        const initials = lead.name ? lead.name.substring(0, 2).toUpperCase() : 'U';
+                        const d = new Date(lead.created_at);
+                        const dateStr = d.toLocaleDateString() + ' à ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                if (leads.length === 0) {
-                    container.innerHTML = '<p class="text-sm text-slate-400 italic">Aucun utilisateur inscrit pour le moment.</p>';
-                    return;
-                }
-
-                // Sort leads newest first
-                leads.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-                leads.forEach(lead => {
-                    const initials = lead.name ? lead.name.substring(0, 2).toUpperCase() : 'U';
-                    const d = new Date(lead.date);
-                    const dateStr = d.toLocaleDateString() + ' à ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                    container.insertAdjacentHTML('beforeend', `
+                        container.insertAdjacentHTML('beforeend', `
     <div
         class="flex bg-slate-50 dark:bg-slate-800 p-4 rounded-lg justify-between items-center transition-all hover:shadow hover:-translate-y-0.5 border border-transparent hover:border-slate-300 dark:hover:border-slate-600">
         <div class="flex items-center gap-3">
@@ -985,19 +977,23 @@
         <div class="text-right">
             <span
                 class="bg-emerald-500/10 text-emerald-500 px-3 py-1 text-xs font-bold rounded-full border border-emerald-500/20">${lead.status
-                        || 'Active'}</span>
+                            || 'Active'}</span>
             <p class="text-[10px] text-slate-400 mt-2">Connecté le ${dateStr}</p>
         </div>
     </div>
     `);
-                });
+                    });
+                } catch (e) {
+                    container.innerHTML = '<p class="text-sm text-slate-400 italic">Erreur de chargement des utilisateurs.</p>';
+                }
             }
+
 
             async function startDataPolling() {
                 let fetchCount = 0;
                 const fetchLiveStreamAdmin = async () => {
                     try {
-                        const res = await fetch('live_stream.json');
+                        const res = await fetch('/api/live');
                         if (!res.ok) return;
                         const data = await res.json();
                         fetchCount++;
@@ -1337,53 +1333,50 @@
                 // --- Subscriptions Live Panel Logic ---
                 const subsFeed = document.getElementById('live-subs-feed');
                 if (subsFeed) {
-                    let leads = [];
                     try {
-                        const data = localStorage.getItem('_sf_ss_p');
-                        if (data) leads = JSON.parse(decodeURIComponent(escape(atob(data))));
+                        const usersRes = await fetch('/api/users');
+                        const leads = await usersRes.json();
+
+                        const countSpan = document.getElementById('sub-count-val');
+                        const mrrSpan = document.getElementById('sub-mrr-val');
+
+                        const subCount = leads.length;
+                        const mrr = subCount * 29;
+
+                        if (countSpan) countSpan.innerText = subCount.toLocaleString();
+                        if (mrrSpan) mrrSpan.innerText = `$${mrr.toLocaleString()}`;
+
+                        subsFeed.innerHTML = '';
+                        if (leads.length === 0) {
+                            subsFeed.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-slate-500 text-sm">Aucun utilisateur inscrit pour le moment.</td></tr>';
+                        } else {
+                            leads.slice(0, 8).forEach(lead => {
+                                const time = new Date(lead.created_at).toLocaleTimeString();
+                                const initials = lead.name ? lead.name.substring(0, 2).toUpperCase() : 'U';
+                                const plan = "SWELLSYNC Ultra";
+
+                                const tr = document.createElement("tr");
+                                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors";
+                                tr.innerHTML = `
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary text-xs">
+                                                ${initials}
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-semibold">${lead.email}</p>
+                                                <p class="text-[10px] text-slate-500">Sub ID: ${btoa(lead.email).substring(0, 8).toUpperCase()}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-slate-300">${plan}</td>
+                                    <td class="px-6 py-4"><span class="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20">Active</span></td>
+                                    <td class="px-6 py-4 text-xs font-mono text-slate-500">${time}</td>
+                                `;
+                                subsFeed.appendChild(tr);
+                            });
+                        }
                     } catch (e) { }
-
-                    const countSpan = document.getElementById('sub-count-val');
-                    const mrrSpan = document.getElementById('sub-mrr-val');
-
-                    // Purely real data derived from localStorage registered leads
-                    const subCount = leads.length;
-                    const mrr = subCount * 29; // Assume $29 Ultra plan per registered test user
-
-                    if (countSpan) countSpan.innerText = subCount.toLocaleString();
-                    if (mrrSpan) mrrSpan.innerText = `$${mrr.toLocaleString()}`;
-
-                    subsFeed.innerHTML = '';
-                    if (leads.length === 0) {
-                        subsFeed.innerHTML = '<tr><td colspan="4" class="px-6 py-4 text-center text-slate-500 text-sm">Aucun utilisateur inscrit pour le moment.</td></tr>';
-                    } else {
-                        // Show ONLY real leads
-                        leads.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 8).forEach(lead => {
-                            const time = new Date(lead.date).toLocaleTimeString();
-                            const initials = lead.name ? lead.name.substring(0, 2).toUpperCase() : 'U';
-                            const plan = "SWELLSYNC Ultra"; // Real default plan 
-
-                            const tr = document.createElement("tr");
-                            tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors";
-                            tr.innerHTML = `
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary text-xs">
-                                            ${initials}
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-semibold">${lead.email}</p>
-                                            <p class="text-[10px] text-slate-500">Sub ID: ${btoa(lead.email).substring(0, 8).toUpperCase()}</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-slate-300">${plan}</td>
-                                <td class="px-6 py-4"><span class="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20">Active</span></td>
-                                <td class="px-6 py-4 text-xs font-mono text-slate-500">${time}</td>
-                            `;
-                            subsFeed.appendChild(tr);
-                        });
-                    }
                 }
 
                 // --- Analytics Traffic Chart Real Tie-In ---

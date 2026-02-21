@@ -963,7 +963,7 @@
             // Dynamic Forecast Integration - AI Swarm Polling
             async function fetchLiveStream() {
                 try {
-                    const response = await fetch('live_stream.json');
+                    const response = await fetch('/api/live');
                     if (!response.ok) return;
                     const data = await response.json();
 
@@ -1186,8 +1186,8 @@
 
             try {
                 const [spotsResp, forecastResp] = await Promise.all([
-                    fetch('spots.json').catch(() => ({ ok: false })),
-                    fetch('forecast_data.json').catch(() => ({ ok: false }))
+                    fetch('/api/spots').catch(() => ({ ok: false })),
+                    fetch('/api/forecasts').catch(() => ({ ok: false }))
                 ]);
 
                 if (spotsResp.ok && forecastResp.ok) {
