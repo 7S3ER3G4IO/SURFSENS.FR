@@ -78,24 +78,7 @@
 
         /* Map Pulse Anim */
         .pulse-ring {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(13, 127, 242, 0.4);
-            animation: pulse-ring 2s infinite;
-        }
-
-        @keyframes pulse-ring {
-            0% {
-                transform: scale(0.3);
-                opacity: 1;
-            }
-
-            100% {
-                transform: scale(1.8);
-                opacity: 0;
-            }
+            display: none;
         }
 
         /* Leaflet Overrides for Dark Mode */
@@ -247,12 +230,12 @@
 
         <!-- Header -->
         <header
-            class="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 dark:border-[#223649] bg-white/80 dark:bg-[#101a23]/80 backdrop-blur-lg px-6 py-4 lg:px-10 transition-all duration-300"
+            class="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 dark:border-[#223649] bg-white dark:bg-[#101a23] px-6 py-4 lg:px-10 transition-colors duration-300"
             id="main-header">
             <div class="flex items-center gap-4 animate-slide-down">
                 <a href="index.html" class="flex items-center gap-2 text-primary hover:scale-105 transition-transform">
                     <img src="images/logo.svg" alt="Logo"
-                        class="w-10 h-10 object-contain hover:scale-110 transition-transform animate-float" />
+                        class="w-10 h-10 object-contain hover:scale-110 transition-transform" />
                     <h2 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight">SWELLSYNC</h2>
                 </a>
             </div>
@@ -297,13 +280,7 @@
                                 radial-gradient(circle at 85% 30%, rgba(11, 218, 91, 0.25), transparent 50%),
                                 radial-gradient(circle at 50% 80%, rgba(11, 107, 201, 0.3), transparent 50%);
                     filter: blur(60px);
-                    animation: pulseGlow 8s ease-in-out infinite alternate;
                 "></div>
-
-                <!-- Fine Grain Texture Overlay for Premium Feel -->
-                <div class="absolute inset-0 z-0 opacity-20 mix-blend-overlay pointer-events-none"
-                    style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E');">
-                </div>
 
                 <div class="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-background-light dark:to-background-dark z-10"
                     style="bottom: -2px;"></div>
@@ -313,12 +290,9 @@
                         style="animation-delay: 200ms;">
                         <!-- Pill Badge -->
                         <div
-                            class="inline-flex items-center gap-3 rounded-full bg-slate-900/40 px-5 py-2 text-xs font-bold text-white backdrop-blur-md border border-white/10 shadow-2xl hover:bg-slate-900/60 hover:border-white/20 transition-all cursor-pointer">
+                            class="inline-flex items-center gap-3 rounded-full bg-slate-900/70 px-5 py-2 text-xs font-bold text-white border border-white/10 shadow-lg hover:bg-slate-900/80 hover:border-white/20 transition-colors cursor-pointer">
                             <span class="relative flex h-3 w-3">
-                                <span
-                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-teal opacity-75"></span>
-                                <span
-                                    class="relative inline-flex rounded-full h-3 w-3 bg-accent-teal shadow-[0_0_10px_#0bda5b]"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-accent-teal"></span>
                             </span>
                             Propulsé par une Analyse Avancée
                         </div>
@@ -338,7 +312,7 @@
                     <!-- Search Bar -->
                     <div class="w-full max-w-2xl animate-slide-down relative" style="animation-delay: 400ms;">
                         <div
-                            class="group flex h-16 items-center overflow-hidden rounded-2xl bg-[#182634]/90 backdrop-blur-lg border border-[#314d68]/50 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/50 transition-all shadow-2xl hover:shadow-primary/10">
+                            class="group flex h-16 items-center overflow-hidden rounded-2xl bg-[#182634] border border-[#314d68]/50 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/50 transition-colors shadow-lg">
                             <div class="flex h-full w-14 items-center justify-center text-slate-400">
                                 <span
                                     class="material-symbols-outlined text-xl transition-transform group-focus-within:scale-110 group-focus-within:text-primary">search</span>
@@ -354,9 +328,9 @@
 
                         <!-- Quick Search Dropdown -->
                         <div id="hero-search-dropdown"
-                            class="absolute top-[calc(100%+8px)] left-0 right-0 bg-[#0f172a]/95 backdrop-blur-xl border border-[#334155]/50 rounded-2xl shadow-2xl overflow-hidden z-[100] max-h-[350px] overflow-y-auto hidden">
+                            class="absolute top-[calc(100%+8px)] left-0 right-0 bg-[#0f172a] border border-[#334155]/50 rounded-2xl shadow-2xl overflow-hidden z-[100] max-h-[350px] overflow-y-auto hidden">
                             <div
-                                class="px-4 py-3 border-b border-[#334155]/50 flex justify-between items-center bg-[#0f172a]/95 sticky top-0 z-10 backdrop-blur-sm">
+                                class="px-4 py-3 border-b border-[#334155]/50 flex justify-between items-center bg-[#0f172a] sticky top-0 z-10">
                                 <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Résultats
                                     rapides</span>
                                 <span
@@ -383,10 +357,9 @@
                             Spots Favoris en Direct
                         </h2>
                         <div id="ai-swarm-stats"
-                            class="mt-4 md:mt-0 flex items-center gap-2 text-xs font-bold text-white bg-slate-900/60 backdrop-blur-md px-5 py-2.5 rounded-full border border-slate-700/50 shadow-xl shadow-black/20">
+                            class="mt-4 md:mt-0 flex items-center gap-2 text-xs font-bold text-white bg-slate-900 px-5 py-2.5 rounded-full border border-slate-700/50 shadow-lg">
                             <div class="flex items-center gap-1 text-emerald-400">
-                                <span
-                                    class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse mr-1 shadow-[0_0_8px_#34d399]"></span>
+                                <span class="w-2 h-2 bg-emerald-400 rounded-full mr-1"></span>
                                 124 Scanners Actifs
                             </div>
                             <span class="text-slate-500 mx-2">|</span>
@@ -415,8 +388,8 @@
                                     <div>
                                         <div class="flex items-center gap-3 mb-2">
                                             <span
-                                                class="inline-flex items-center gap-1.5 rounded-lg bg-red-500/20 px-2.5 py-1 text-xs font-bold text-red-500 border border-red-500/30 backdrop-blur-sm">
-                                                <span class="h-2 w-2 rounded-full bg-red-500 animate-ping"></span> Live
+                                                class="inline-flex items-center gap-1.5 rounded-lg bg-red-500/20 px-2.5 py-1 text-xs font-bold text-red-500 border border-red-500/30">
+                                                <span class="h-2 w-2 rounded-full bg-red-500"></span> Live
                                                 HD
                                             </span>
                                         </div>
@@ -571,7 +544,7 @@
                                 <span class="text-sm font-bold text-emerald-500 mb-2">+1.2 vs hier</span>
                             </div>
                             <div class="mt-4 w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
-                                <div class="bg-accent-teal h-2.5 rounded-full w-[90%] animate-pulse-glow"></div>
+                                <div class="bg-accent-teal h-2.5 rounded-full w-[90%]"></div>
                             </div>
                             <p class="mt-4 text-xs text-slate-500 font-medium">Conditions Épiques détectées sur la côte
                                 Landaise aujourd'hui.</p>
@@ -625,8 +598,8 @@
                                     <h3 class="text-sm font-bold text-white uppercase tracking-wider">Radar Houle 3D
                                     </h3>
                                     <span
-                                        class="flex items-center gap-1.5 rounded-full bg-red-500/20 px-2.5 py-1 text-[10px] font-bold text-red-500 border border-red-500/30 backdrop-blur-md">
-                                        <span class="h-2 w-2 rounded-full bg-red-500 animate-ping"></span> Live
+                                        class="flex items-center gap-1.5 rounded-full bg-red-500/20 px-2.5 py-1 text-[10px] font-bold text-red-500 border border-red-500/30">
+                                        <span class="h-2 w-2 rounded-full bg-red-500"></span> Live
                                     </span>
                                 </div>
                                 <div class="mt-2">
@@ -642,17 +615,14 @@
                                 <!-- Abstract map points overlay -->
                                 <div
                                     class="absolute right-8 top-1/2 -translate-y-1/2 w-24 h-24 hidden sm:block opacity-80 group-hover:scale-110 transition-transform duration-500">
-                                    <div
-                                        class="absolute inset-0 border-[3px] border-white/10 rounded-full animate-[spin_10s_linear_infinite]">
+                                    <div class="absolute inset-0 border-[3px] border-white/10 rounded-full">
                                     </div>
-                                    <div
-                                        class="absolute inset-3 border border-primary/50 rounded-full animate-[spin_6s_linear_infinite_reverse]">
+                                    <div class="absolute inset-3 border border-primary/50 rounded-full">
                                     </div>
-                                    <div
-                                        class="absolute inset-8 border border-accent-teal/30 rounded-full animate-[spin_3s_linear_infinite]">
+                                    <div class="absolute inset-8 border border-accent-teal/30 rounded-full">
                                     </div>
                                     <div class="absolute inset-0 flex items-center justify-center">
-                                        <div class="w-2 h-2 bg-accent-teal rounded-full shadow-[0_0_15px_#0bda5b]">
+                                        <div class="w-2 h-2 bg-accent-teal rounded-full">
                                         </div>
                                     </div>
                                 </div>
@@ -683,8 +653,7 @@
                             </div>
                             <div
                                 class="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-                                <span
-                                    class="material-symbols-outlined text-emerald-500 text-sm animate-pulse">database</span>
+                                <span class="material-symbols-outlined text-emerald-500 text-sm">database</span>
                                 <span class="text-xs font-bold text-emerald-500 tracking-wider">DB-Backed</span>
                             </div>
                         </div>
@@ -727,8 +696,7 @@
                                     </div>
                                     <button
                                         class="w-full bg-surface-dark border border-emerald-500/30 hover:bg-emerald-500/10 transition-colors text-emerald-500 py-3 rounded-lg flex items-center justify-center gap-2 text-sm font-bold group">
-                                        <span
-                                            class="w-2 h-2 rounded-full bg-emerald-500 group-hover:animate-ping"></span>
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                                         TROUVER MON SPOT
                                     </button>
                                 </div>
@@ -971,7 +939,7 @@
                     const aiStatsEl = document.getElementById('ai-swarm-stats');
                     if (aiStatsEl && data._meta) {
                         aiStatsEl.innerHTML = `
-                            <span class="flex items-center gap-2"><span class="w-2 h-2 bg-emerald-400 rounded-full animate-ping shadow-[0_0_10px_#34d399]"></span> <span class="text-white">${data._meta.activeRobots} Scanners Actifs</span></span>
+                            <span class="flex items-center gap-2"><span class="w-2 h-2 bg-emerald-400 rounded-full"></span> <span class="text-white">${data._meta.activeRobots} Scanners Actifs</span></span>
                             <span class="mx-3 text-slate-700">|</span>
                             <span class="text-emerald-400 font-black uppercase tracking-widest bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/30 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">verified</span> PRÉCISION: ${data._meta.globalReliability}%</span>
                             <span class="mx-3 text-slate-700">|</span>
@@ -1019,7 +987,7 @@
 
     <!-- Global Auth Modal -->
     <div id="auth-modal"
-        class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 opacity-0 transition-opacity duration-300">
         <div class="relative w-full max-w-md transform rounded-2xl bg-white dark:bg-slate-900 shadow-2xl transition-all scale-95 opacity-0"
             id="auth-modal-content">
 
